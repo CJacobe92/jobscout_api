@@ -31,6 +31,21 @@ RSpec.describe "Api::V1::Applicants", type: :request do
           expect(data).not_to include(restricted_parameters)
         end
       end
+
+      context 'with incorrect authorization' do
+
+        let!(:unauthorized_user) { create(:applicant)}
+        let!(:admin) { create(:admin) }
+  
+  
+        before do
+          get "/api/v1/applicants", headers: { 'Authorization' => access_token(unauthorized_user)}
+        end
+  
+        it 'returns 401 status' do
+          expect(response).to have_http_status(:unauthorized)
+        end
+      end
     end
   end
 
@@ -82,20 +97,30 @@ RSpec.describe "Api::V1::Applicants", type: :request do
         expect(json).not_to include(restricted_parameters)
       end
 
-      it 'returns not found when resource does not exist' do
-        get "/api/v1/applicants/99999", headers: { 'Authorization' => access_token(accessing_applicant)}
-        expect(json['error']).to eq('Resource not found')
+      context 'with correct authorization but unowned resource' do
+
+        let!(:unauthorized_user) { create(:applicant)}
+        let!(:applicant) { create(:applicant) }
+  
+  
+        before do
+          get "/api/v1/applicants/#{applicant.id}", headers: { 'Authorization' => access_token(unauthorized_user)}
+        end
+  
+        it 'returns 401 status' do
+          expect(response).to have_http_status(:unauthorized)
+        end
       end
     end
   end
 
   describe "PATCH /update" do
-    let!(:accessing_applicant) { create(:applicant)}
+    let!(:applicant) { create(:applicant)}
 
     context 'with correct authorization' do
       before do
         params = { applicant: { firstname: 'root' } }
-        patch "/api/v1/applicants/#{accessing_applicant.id}", headers: { 'Authorization' => access_token(accessing_applicant)}, params: params
+        patch "/api/v1/applicants/#{applicant.id}", headers: { 'Authorization' => access_token(applicant)}, params: params
       end
 
       it 'returns 200 status' do
@@ -109,9 +134,20 @@ RSpec.describe "Api::V1::Applicants", type: :request do
         expect(json['firstname']).to include('root')
       end
 
-      it 'returns not found when resource does not exist' do
-        get "/api/v1/applicants/99999", headers: { 'Authorization' => access_token(accessing_applicant)}
-        expect(json['error']).to eq('Resource not found')
+      context 'with correct authorization but unowned resource' do
+
+        let!(:unauthorized_user) { create(:applicant)}
+        let!(:applicant) { create(:applicant) }
+  
+  
+        before do
+          params = { applicant: { firstname: 'root' } }
+          patch "/api/v1/applicants/#{applicant.id}", headers: { 'Authorization' => access_token(unauthorized_user)}, params: params
+        end
+  
+        it 'returns 401 status' do
+          expect(response).to have_http_status(:unauthorized)
+        end
       end
     end
   end
@@ -129,11 +165,31 @@ RSpec.describe "Api::V1::Applicants", type: :request do
       it 'returns no content' do
         expect(response).to have_http_status(:no_content)
       end
+    end
 
-      it 'returns not found when resource does not exist' do
-        get "/api/v1/applicants/99999", headers: { 'Authorization' => access_token(accessing_admin)}
-        expect(json['error']).to eq('Resource not found')
+    context 'with incorrect authorization' do
+
+      let!(:unauthorized_user) { create(:applicant)}
+      let!(:applicant) { create(:applicant) }
+
+
+      before do
+        params = { applicant: { firstname: 'root' } }
+        delete "/api/v1/applicants/#{applicant.id}", headers: { 'Authorization' => access_token(unauthorized_user)}, params: params
       end
+
+      it 'returns 401 status' do
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+  end
+
+  describe 'load_applicant' do
+    let!(:applicant) { create(:applicant) }
+
+    it 'returns not found when resource does not exist' do
+      get "/api/v1/applicants/99999", headers: { 'Authorization' => access_token(applicant)}
+      expect(json['error']).to eq('Resource not found')
     end
   end
 end

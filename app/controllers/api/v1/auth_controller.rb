@@ -46,7 +46,7 @@ class Api::V1::AuthController < ApplicationController
 
     response_headers(account, access_token)
 
-    render json: { message: 'Login success', refresh_token: refresh_token }, status: :ok
+    render json: { message: 'Login success', access_token: access_token }, status: :ok
   end
 
   def handle_failed_signin(account)
