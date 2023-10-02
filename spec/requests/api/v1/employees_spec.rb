@@ -5,11 +5,11 @@ RSpec.describe "Api::V1::Employees", type: :request do
     let!(:owner) { create(:owner) }
     let!(:tenant) { create(:tenant, owner_id: owner.id) }
     let!(:existing_employees) { create_list(:employee, 10, tenant_id: tenant.id) }
-    let!(:accessing_admin) { create(:admin) }
+    let!(:admin) { create(:admin) }
 
     context 'with correct authorization' do
       before do
-        get '/api/v1/employees', headers: { 'Authorization' => access_token(accessing_admin)}
+        get '/api/v1/employees', headers: { 'Authorization' => access_token(admin)}
       end
 
       it 'returns 200 status' do
@@ -53,14 +53,19 @@ RSpec.describe "Api::V1::Employees", type: :request do
 
     let!(:owner) { create(:owner) }
     let!(:tenant) { create(:tenant, owner_id: owner.id) }
+    let!(:admin) { create(:admin) }
+    
+    context 'with correct authorization' do
 
-    context 'when applicants sign up' do
-      before do
+      it 'with correct parameters returns 201 status for owner' do
         params = { employee: attributes_for(:employee, tenant_id: tenant.id) }
         post '/api/v1/employees', headers: { 'Authorization' => access_token(owner) }, params: params
+        expect(response).to have_http_status(:created)
       end
 
-      it 'with correct parameters returns 201 status' do
+      it 'with correct parameters returns 201 status for admin' do
+        params = { employee: attributes_for(:employee, tenant_id: tenant.id) }
+        post '/api/v1/employees', headers: { 'Authorization' => access_token(admin) }, params: params
         expect(response).to have_http_status(:created)
       end
 
@@ -88,121 +93,168 @@ RSpec.describe "Api::V1::Employees", type: :request do
   describe "GET /show" do
     let!(:owner) { create(:owner) }
     let!(:tenant) { create(:tenant, owner_id: owner.id) }
-    let!(:accessing_employee) { create(:employee, tenant_id: tenant.id)}
-    let!(:accessing_admin) { create(:admin) }
+    let!(:employee) { create(:employee, tenant_id: tenant.id)}
+    let!(:admin) { create(:admin) }
    
+    context 'with correct authorization' do
+      it 'returns 200 status for owner' do
+        get "/api/v1/employees/#{employee.id}", headers: { 'Authorization' => access_token(owner)}
 
-    it 'returns 200 status for owner' do
-      get "/api/v1/employees/#{accessing_employee.id}", headers: { 'Authorization' => access_token(owner)}
+        expect(response).to have_http_status(:ok)
+      end
 
-      expect(response).to have_http_status(:ok)
+      it 'returns 200 status for admin' do
+        get "/api/v1/employees/#{employee.id}", headers: { 'Authorization' => access_token(admin)}
+
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns 200 status for employee' do
+        get "/api/v1/employees/#{employee.id}", headers: { 'Authorization' => access_token(employee)}
+
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns the correct response body' do
+
+        get "/api/v1/employees/#{employee.id}", headers: { 'Authorization' => access_token(employee)}
+
+        restricted_parameters = %w[
+          password_digest
+          access_token
+          refresh_token
+          reset_token
+          otp_secret_key
+          enabled
+          otp_enabled
+          otp_required
+          activation_token
+        ]
+
+        expect(json).not_to include(restricted_parameters)
+      end
     end
 
-    it 'returns 200 status for admin' do
-      get "/api/v1/employees/#{accessing_employee.id}", headers: { 'Authorization' => access_token(accessing_admin)}
+    context 'with incorrect authorization' do
+      let!(:unauthorized_user) { create(:applicant)}
 
-      expect(response).to have_http_status(:ok)
-    end
+      before do
+        get "/api/v1/employees/#{employee.id}", headers: { 'Authorization' => access_token(unauthorized_user)}
+      end
 
-    it 'returns 200 status for employee' do
-      get "/api/v1/employees/#{accessing_employee.id}", headers: { 'Authorization' => access_token(accessing_employee)}
-
-      expect(response).to have_http_status(:ok)
-    end
-
-    it 'returns the correct response body' do
-
-      get "/api/v1/employees/#{accessing_employee.id}", headers: { 'Authorization' => access_token(accessing_employee)}
-
-      restricted_parameters = %w[
-        password_digest
-        access_token
-        refresh_token
-        reset_token
-        otp_secret_key
-        enabled
-        otp_enabled
-        otp_required
-        activation_token
-      ]
-
-      expect(json).not_to include(restricted_parameters)
+      it 'returns 401 status' do
+        expect(response).to have_http_status(:unauthorized)
+      end
     end
   end
 
-  # describe "GET /show" do
-  #   let!(:owner) { create(:owner) }
-  #   let!(:tenant) { create(:tenant, owner_id: owner.id) }
-  #   let!(:accessing_employee) { create(:employee, tenant_id: tenant.id)}
-  #   let!(:accessing_admin) { create(:admin) }
+  describe "PATCH /update" do
+    let!(:owner) { create(:owner) }
+    let!(:tenant) { create(:tenant, owner_id: owner.id) }
+    let!(:employee) { create(:employee, tenant_id: tenant.id)}
+    let!(:admin) { create(:admin) }
    
+    context 'with correct authorization' do
+      it 'updates with correct data returns 200 status for owner' do
+        params = { employee: {firstname: 'root', tenant_id: tenant.id } }
+        patch "/api/v1/employees/#{employee.id}", headers: { 'Authorization' => access_token(owner)}, params: params
 
-  #   it 'returns 200 status for owner' do
-  #     get "/api/v1/employees/#{accessing_employee.id}", headers: { 'Authorization' => access_token(owner)}
+        expect(response).to have_http_status(:ok)
+        expect(json['firstname']).to eq('root')
+      end
 
-  #     expect(response).to have_http_status(:ok)
-  #   end
+      it 'updates with correct data returns 200 status for admin' do
+        params = { employee: {firstname: 'root', tenant_id: tenant.id } }
+        patch "/api/v1/employees/#{employee.id}", headers: { 'Authorization' => access_token(admin)}, params: params
 
-  #   it 'returns 200 status for admin' do
-  #     get "/api/v1/employees/#{accessing_employee.id}", headers: { 'Authorization' => access_token(accessing_admin)}
+        expect(response).to have_http_status(:ok)
+        expect(json['firstname']).to eq('root')
+      end
 
-  #     expect(response).to have_http_status(:ok)
-  #   end
+      it 'updates with correct data returns 200 status for employee' do
+        params = { employee: {firstname: 'root', tenant_id: tenant.id } }
+        patch "/api/v1/employees/#{employee.id}", headers: { 'Authorization' => access_token(employee)}, params: params
 
-  #   it 'returns 200 status for employee' do
-  #     get "/api/v1/employees/#{accessing_employee.id}", headers: { 'Authorization' => access_token(accessing_employee)}
+        expect(response).to have_http_status(:ok)
+        expect(json['firstname']).to eq('root')
+      end
 
-  #     expect(response).to have_http_status(:ok)
-  #   end
+      it 'returns the correct response body' do
 
-  #   it 'returns the correct response body' do
+        params = { employee: {firstname: 'root', tenant_id: tenant.id } }
+        patch "/api/v1/employees/#{employee.id}", headers: { 'Authorization' => access_token(employee)}, params: params
 
-  #     get "/api/v1/employees/#{accessing_employee.id}", headers: { 'Authorization' => access_token(accessing_employee)}
+        restricted_parameters = %w[
+          password_digest
+          access_token
+          refresh_token
+          reset_token
+          otp_secret_key
+          enabled
+          otp_enabled
+          otp_required
+          activation_token
+        ]
 
-  #     restricted_parameters = %w[
-  #       password_digest
-  #       access_token
-  #       refresh_token
-  #       reset_token
-  #       otp_secret_key
-  #       enabled
-  #       otp_enabled
-  #       otp_required
-  #       activation_token
-  #     ]
+        expect(json).not_to include(restricted_parameters)
+      end
+    end
 
-  #     expect(json).not_to include(restricted_parameters)
-  #   end
+    context 'with incorrect authorization' do
+      let!(:unauthorized_user) { create(:applicant)}
 
-  #   it 'returns not found when resource does not exist' do
-  #     get "/api/v1/employees/99999", headers: { 'Authorization' => access_token(accessing_employee)}
-  #     expect(json['error']).to eq('Resource not found')
-  #   end
-  # end
+      before do
+        params = { employee: {firstname: 'root', tenant_id: tenant.id } }
+        patch "/api/v1/employees/#{employee.id}", headers: { 'Authorization' => access_token(unauthorized_user)}, params: params
+      end
 
-  # describe "DELETE /destroy" do
-  #   let!(:owner) { create(:owner) }
-  #   let!(:tenant) { create(:tenant, owner_id: owner.id) }
-  #   let!(:employee) { create(:employee, tenant_id: tenant.id)}
+      it 'returns 401 status' do
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+  end
 
-  #   let!(:accessing_admin) { create(:admin) }
+  describe "DELETE /destroy" do
+    let!(:owner) { create(:owner) }
+    let!(:tenant) { create(:tenant, owner_id: owner.id) }
+    let!(:employee) { create(:employee, tenant_id: tenant.id)}
+    let!(:admin) { create(:admin) }
    
+    context 'with correct authorization' do
+      it 'deletes employee and return 204 status for owner' do
+        delete "/api/v1/employees/#{employee.id}", headers: { 'Authorization' => access_token(owner) }
 
-  #   it 'returns 204 status for owner' do
-  #     delete "/api/v1/employees/#{employee.id}", headers: { 'Authorization' => access_token(owner)}
+        expect(response).to have_http_status(:no_content)
+      end
 
-  #     expect(response).to have_http_status(:no_content)
-  #   end
+      it 'updates with correct data returns 200 status for admin' do
+        delete "/api/v1/employees/#{employee.id}", headers: { 'Authorization' => access_token(admin) }
 
-  #   it 'returns 204 status for admin' do
-  #     delete "/api/v1/employees/#{employee.id}", headers: { 'Authorization' => access_token(accessing_admin)}
+        expect(response).to have_http_status(:no_content)
+      end
+    end
 
-  #     expect(response).to have_http_status(:no_content)
-  #   end
+    context 'with incorrect authorization' do
+      let!(:unauthorized_user) { create(:applicant)}
 
-  #   it 'returns not found when resource does not exist' do
-  #     delete "/api/v1/employees/99999", headers: { 'Authorization' => access_token(owner)}
-  #     expect(json['error']).to eq('Resource not found')
-  #   end
-  # end
+      before do
+        delete "/api/v1/employees/#{employee.id}", headers: { 'Authorization' => access_token(unauthorized_user)}
+      end
+
+      it 'returns 401 status' do
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+  end
+
+  describe 'load_employee' do
+    let!(:owner) { create(:owner) }
+    let!(:tenant) { create(:tenant, owner_id: owner.id) }
+    let!(:employee) { create(:employee, tenant_id: tenant.id) }
+
+    it 'returns not found when resource does not exist' do
+      get "/api/v1/employees/99999", headers: { 'Authorization' => access_token(employee)}
+      expect(json['error']).to eq('Resource not found')
+    end
+  end
 end
