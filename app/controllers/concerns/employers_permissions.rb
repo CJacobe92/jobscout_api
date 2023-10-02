@@ -1,4 +1,4 @@
-module ApplicantPermissions
+module EmployerPermissions
   extend ActiveSupport::Concern
     include GlobalPermissions
 
@@ -11,9 +11,8 @@ module ApplicantPermissions
     end
 
     def user_scope
-      allowed_roles = %w[ applicant ]
+      allowed_roles = %w[ employer ]
 
-      return allowed_roles.include?(@current_user.role) && @current_applicant.id == @current_user.id
+      return allowed_roles.include?(@current_user.role) && @current_employer.id == @current_user.id
     end
-
 end

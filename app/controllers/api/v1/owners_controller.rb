@@ -1,39 +1,60 @@
-require './app/services/role_auth'
-
 class Api::V1::OwnersController < ApplicationController
-  include RoleAuth
+  include OwnerPermissions
+  include GlobalPermissions
+  include MessageHelper
   before_action :load_owner, only: [ :show, :update , :destroy ] 
   before_action :admin_only, only: [ :index, :destroy ]
   before_action :authenticate, except: [ :create ]
 
   def index
-    @owners = Owner.all
-    render 'index', status: :ok
+    if global_scope
+      @owners = Owner.all
+      render 'index', status: :ok
+    else
+      render json: UNAUTHORIZED, status: :unauthorized
+    end
   end
 
   def create
     @owner = Owner.new(owner_params)
     
     if @owner.save
-      render json: { message: 'Owner created'}, status: :created
+      render json: CREATED, status: :created
     else
-      render json: { error: 'Failed to create owner'}, status: :unprocessable_entity
+      render json: UNPROCESSABLE_ENTITY, status: :unprocessable_entity
     end
   end
 
   def show
-    return unless @current_owner
-    render 'show', status: :ok
+    if administration_scope || global_scope
+      render 'show', status: :ok
+    else
+      render json: UNAUTHORIZED, status: :unauthorized
+    end
   end
 
   def update
-    return unless @current_owner.update(owner_params)
-    render 'update', status: :ok
+    if administration_scope || global_scope
+      if @current_owner.update(owner_params)
+        render 'update', status: :ok
+      else
+        render json: UNPROCESSABLE_ENTITY, status: :unprocessable_entity
+      end
+    else
+      render json: UNAUTHORIZED, status: :unauthorized
+    end
   end
 
   def destroy
-    return unless @current_owner.destroy
-    head :no_content
+    if global_scope
+      if @current_owner.destroy
+        head :no_content
+      else
+        render json: DELETION_FAILED, status: :unprocessable_entity
+      end
+    else
+      render json: UNAUTHORIZED, status: :unauthorized
+    end
   end
 
   private

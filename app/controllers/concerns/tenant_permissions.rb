@@ -1,19 +1,17 @@
-module ApplicantPermissions
+module TenantPermissions
   extend ActiveSupport::Concern
     include GlobalPermissions
 
     def administration_scope
       return true if global_scope
 
-      allowed_roles = %w[ owner employee ]
-
       return allowed_roles.include?(@current_user.role)
     end
 
     def user_scope
-      allowed_roles = %w[ applicant ]
+      allowed_roles = %w[ owner ]
 
-      return allowed_roles.include?(@current_user.role) && @current_applicant.id == @current_user.id
+      return allowed_roles.include?(@current_user.role) && @current_tenant.owner_id == @current_user.id
     end
 
 end

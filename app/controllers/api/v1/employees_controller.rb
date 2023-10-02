@@ -1,38 +1,61 @@
-require './app/services/role_auth'
-
 class Api::V1::EmployeesController < ApplicationController
-  include RoleAuth
+  include EmployeePermissions
+  include MessageHelper
   before_action :load_employee, only: [:show, :update , :destroy]
-  before_action :admin_or_owner_only, only: [:index, :create, :destroy]
 
   def index
-    @employees = Employee.all
-    render 'index', status: :ok
+    if administration_scope
+      @Employees = Employee.all
+      render 'index', status: :ok
+    else
+      render json: UNAUTHORIZED, status: :unauthorized
+    end
   end
 
   def create
-    @employee = Employee.new(employee_params)
-    
-    if @employee.save
-      render json: { message: 'Employee created'}, status: :created
+    if administration_scope
+      @employee = Employee.new(employee_params)
+      
+      if @employee.save
+        render json: CREATED, status: :created
+      else
+        render json: UNPROCESSABLE_ENTITY, status: :unprocessable_entity
+      end
     else
-      render json: { error: 'Failed to create employee'}, status: :unprocessable_entity
+      render json: UNAUTHORIZED, status: :unauthorized
     end
   end
 
   def show
-    return unless @current_employee
-    render 'show', status: :ok
+    if user_scope || administration_scope
+      render 'show', status: :ok
+    else
+      render json: UNAUTHORIZED, status: :unauthorized
+    end
   end
 
   def update
-    return unless @current_employee.update(employee_params)
-    render 'update', status: :ok
+    if user_scope || administration_scope
+      if @current_employee.update(employee_params)
+        render 'update', status: :ok
+      else
+        render json: UNPROCESSABLE_ENTITY, status: :unprocessable_entity
+      end
+    else
+      render json: UNAUTHORIZED, status: :unauthorized
+    end
   end
 
   def destroy
-    return unless @current_employee.destroy
-    head :no_content
+    if administration_scope
+      if @current_employee.destroy
+        head :no_content
+      else
+        render json: DELETION_FAILED, status: :unprocessable_entity
+      end
+    else
+      render json: UNAUTHORIZED, status: :unauthorized
+    end
   end
 
   private

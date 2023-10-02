@@ -1,6 +1,10 @@
+
 class Api::V1::ApplicantsController < ApplicationController
   include ApplicantPermissions
   include MessageHelper
+
+  before_action :authenticate, except: [ :create ]
+  before_action :load_applicant, only: [:show, :update, :destroy]
 
   def index
     if administration_scope
@@ -22,7 +26,7 @@ class Api::V1::ApplicantsController < ApplicationController
   end
 
   def show
-    if user_scope || administration_scope 
+    if user_scope || administration_scope
       render 'show', status: :ok
     else
       render json: UNAUTHORIZED, status: :unauthorized

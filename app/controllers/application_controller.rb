@@ -60,5 +60,5 @@ class ApplicationController < ActionController::API
       { account: account, type: result['type'] }
     end
   end  
-  
+
 end
