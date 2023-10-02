@@ -33,6 +33,19 @@ RSpec.describe "Api::V1::Admins", type: :request do
         end
       end
     end
+
+    context 'with incorrect authorization' do
+
+      let!(:owner) { create(:owner) }
+
+      before do
+        get '/api/v1/admins', headers: { 'Authorization' => access_token(owner)}
+      end
+
+      it 'returns 401 status' do
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
   end
 
   describe "POST /create" do
@@ -54,12 +67,28 @@ RSpec.describe "Api::V1::Admins", type: :request do
         expect(response).to have_http_status(:unprocessable_entity)
       end
     end
+
+    context 'with incorrect authorization' do
+
+      let!(:owner) { create(:owner) }
+
+      before do
+        params = { admin: attributes_for(:admin) }
+        post '/api/v1/admins', headers: { 'Authorization' => access_token(owner)}, params: params
+      end
+
+      it 'returns 401 status' do
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
   end
 
   describe "GET /show" do
-    let!(:accessing_admin) { create(:admin) }
 
     context 'with correct authorization' do
+
+      let!(:accessing_admin) { create(:admin) }
+
       before do
         get "/api/v1/admins/#{accessing_admin.id}", headers: { 'Authorization' => access_token(accessing_admin)}
       end
@@ -83,18 +112,28 @@ RSpec.describe "Api::V1::Admins", type: :request do
 
         expect(json).not_to include(restricted_parameters)
       end
+    end
 
-      it 'returns not found when resource does not exist' do
-        get "/api/v1/admins/99999", headers: { 'Authorization' => access_token(accessing_admin)}
-        expect(json['error']).to eq('Resource not found')
+    context 'with incorrect authorization' do
+
+      let!(:unauthorized_user) { create(:owner) }
+      let!(:admin) { create(:admin) }
+
+
+      before do
+        get "/api/v1/admins/#{admin.id}", headers: { 'Authorization' => access_token(unauthorized_user)}
+      end
+
+      it 'returns 401 status' do
+        expect(response).to have_http_status(:unauthorized)
       end
     end
   end
 
-  describe "PATCH /update" do
-    let!(:accessing_admin) { create(:admin) }
+  describe 'PATCH /update' do
+    context 'with correct authorization and parameters' do
+      let!(:accessing_admin) { create(:admin) }
 
-    context 'with correct authorization' do
       before do
         params = { admin: { firstname: 'root' } }
         patch "/api/v1/admins/#{accessing_admin.id}", headers: { 'Authorization' => access_token(accessing_admin)}, params: params
@@ -120,10 +159,21 @@ RSpec.describe "Api::V1::Admins", type: :request do
         expect(json).not_to include(restricted_parameters)
         expect(json['firstname']).to include('root')
       end
+    end
 
-      it 'returns not found when resource does not exist' do
-        get "/api/v1/admins/99999", headers: { 'Authorization' => access_token(accessing_admin)}
-        expect(json['error']).to eq('Resource not found')
+    context 'with incorrect authorization' do
+
+      let!(:unauthorized_user) { create(:owner) }
+      let!(:admin) { create(:admin) }
+
+
+      before do
+        params = { admin: { firstname: 'root' } }
+        patch "/api/v1/admins/#{admin.id}", headers: { 'Authorization' => access_token(unauthorized_user)}, params: params
+      end
+
+      it 'returns 401 status' do
+        expect(response).to have_http_status(:unauthorized)
       end
     end
   end
@@ -141,11 +191,30 @@ RSpec.describe "Api::V1::Admins", type: :request do
       it 'returns no content' do
         expect(response).to have_http_status(:no_content)
       end
+    end
 
-      it 'returns not found when resource does not exist' do
-        get "/api/v1/admins/99999", headers: { 'Authorization' => access_token(accessing_admin)}
-        expect(json['error']).to eq('Resource not found')
+    context 'with incorrect authorization' do
+
+      let!(:unauthorized_user) { create(:owner) }
+      let!(:admin) { create(:admin) }
+
+
+      before do
+        delete "/api/v1/admins/#{admin.id}", headers: { 'Authorization' => access_token(unauthorized_user)}
       end
+
+      it 'returns 401 status' do
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+  end
+
+  describe 'load_admin' do
+    let!(:admin) { create(:admin) }
+
+    it 'returns not found when resource does not exist' do
+      get "/api/v1/admins/99999", headers: { 'Authorization' => access_token(admin)}
+      expect(json['error']).to eq('Resource not found')
     end
   end
 end

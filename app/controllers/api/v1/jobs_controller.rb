@@ -1,34 +1,56 @@
 class Api::V1::JobsController < ApplicationController
+  include JobPermissions
+  include MessageHelper
   before_action :load_job, except: [:index, :create]
+  before_action :authenticate, except: [:show]
 
   def index
-    @jobs = Job.all
-    render json: 'index', status: :ok
+    if administration_scope
+      @jobs = Job.all
+      render json: 'index', status: :ok
+    else
+      render json: UNAUTHORIZED, status: :unauthorized
+    end
   end
 
   def create
-    @job = Job.new(job_params)
+    if administration_scope || user_scope
+      @job = Job.new(job_params)
 
-    if @job.save
-      render json: {message: 'Job created'}, status: :created
+      if @job.save
+        render json: CREATED, status: :created
+      else
+        render json: :UNPROCESSABLE_ENTITY, status: :unprocessable_entity
+      end
     else
-      render json: {error: 'Failed to create job'}, status: :unprocessable_entity
+      render json: UNAUTHORIZED, status: :unauthorized
     end
   end
 
   def show
-    return unless @current_job
-    render 'show', status: :ok
+    if administration_scope || user_scope
+      render 'show', status: :ok
+    else
+      render json: UNAUTHORIZED, status: :unauthorized
+    end
   end
 
   def update
-    return unless @current_job.update(job_params)
-    render 'update', status: :ok
+    if administration_scope || user_scope
+      @current_job.update(job_params)
+      render 'update', status: :ok
+    else
+      render json: UNAUTHORIZED, status: :unauthorized
+    end
   end
 
   def destroy
-    return unless @current_job.destroy
-    head :no_content
+    if administration_scope || user_scope
+      @current_job.destroy
+      head :no_content
+    else
+      render json: UNAUTHORIZED, status: :unauthorized
+    end
   end
 
   private

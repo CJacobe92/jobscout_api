@@ -32,11 +32,8 @@ class Api::V1::EmployersController < ApplicationController
 
   def update
     if user_scope || administration_scope
-      if @current_employer.update(employer_params)
-        render 'update', status: :ok
-      else
-        render json: UNPROCESSABLE_ENTITY, status: :unprocessable_entity
-      end
+      @current_employer.update(employer_params)
+      render 'update', status: :ok
     else
       render json: UNAUTHORIZED, status: :unauthorized
     end
@@ -44,11 +41,8 @@ class Api::V1::EmployersController < ApplicationController
 
   def destroy
     if administration_scope
-      if @current_owner.destroy
-        head :no_content
-      else
-        render json: DELETION_FAILED, status: :unprocessable_entity
-      end
+      @current_owner.destroy
+      head :no_content
     else
       render json: UNAUTHORIZED, status: :unauthorized
     end

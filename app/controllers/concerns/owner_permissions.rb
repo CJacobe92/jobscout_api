@@ -1,4 +1,4 @@
-module ApplicantPermissions
+module OwnerPermissions
   extend ActiveSupport::Concern
     include GlobalPermissions
 

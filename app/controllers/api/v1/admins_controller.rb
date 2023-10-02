@@ -37,11 +37,8 @@ class Api::V1::AdminsController < ApplicationController
 
   def update
     if global_scope
-      if @current_admin.update(admin_params)
-         render 'update', status: :ok
-      else
-        render json: UNPROCESSABLE_ENTITY, status: :unprocessable_entity
-      end
+        @current_admin.update(admin_params)
+        render 'update', status: :ok
     else
       render json: UNAUTHORIZED, status: :unauthorized
     end  
@@ -49,11 +46,8 @@ class Api::V1::AdminsController < ApplicationController
 
   def destroy
     if global_scope
-      if @current_admin.destroy
-         head :no_content
-      else
-        render json: DELETION_FAILED, status: :unprocessable_entity
-      end
+      @current_admin.destroy
+      head :no_content
     else
       render json: UNAUTHORIZED, status: :unauthorized
     end  

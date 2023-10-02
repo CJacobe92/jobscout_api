@@ -32,11 +32,8 @@ class Api::V1::TenantsController < ApplicationController
 
   def update
     if user_scope || administration_scope
-      if @current_tenant.update(tenant_params)
-        render 'update', status: :ok
-      else
-        render json: UNPROCESSABLE_ENTITY, status: :unprocessable_entity
-      end
+      @current_tenant.update(tenant_params)
+      render 'update', status: :ok
     else
       render json: UNAUTHORIZED, status: :unauthorized
     end
@@ -44,11 +41,8 @@ class Api::V1::TenantsController < ApplicationController
 
   def destroy
     if administration_scope
-      if @current_tenant.destroy
-        head :no_content
-      else
-        render json: DELETION_FAILED, status: :unprocessable_entity
-      end
+      @current_tenant.destroy
+      head :no_content
     else
       render json: UNAUTHORIZED, status: :unauthorized
     end

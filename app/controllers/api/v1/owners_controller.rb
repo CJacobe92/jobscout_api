@@ -35,11 +35,8 @@ class Api::V1::OwnersController < ApplicationController
 
   def update
     if administration_scope || global_scope
-      if @current_owner.update(owner_params)
-        render 'update', status: :ok
-      else
-        render json: UNPROCESSABLE_ENTITY, status: :unprocessable_entity
-      end
+      @current_owner.update(owner_params)
+      render 'update', status: :ok
     else
       render json: UNAUTHORIZED, status: :unauthorized
     end
