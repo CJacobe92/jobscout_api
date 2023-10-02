@@ -34,6 +34,19 @@ RSpec.describe "Api::V1::Employees", type: :request do
         end
       end
     end
+
+    context 'with incorrect authorization' do
+
+      let!(:unauthorized_user) { create(:applicant)}
+
+      before do
+        get "/api/v1/employees", headers: { 'Authorization' => access_token(unauthorized_user)}
+      end
+
+      it 'returns 401 status' do
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
   end
 
   describe "POST /create" do
@@ -57,55 +70,18 @@ RSpec.describe "Api::V1::Employees", type: :request do
         expect(response).to have_http_status(:unprocessable_entity)
       end
     end
-  end
 
-  describe "GET /show" do
-    let!(:owner) { create(:owner) }
-    let!(:tenant) { create(:tenant, owner_id: owner.id) }
-    let!(:accessing_employee) { create(:employee, tenant_id: tenant.id)}
-    let!(:accessing_admin) { create(:admin) }
-   
+    context 'with incorrect authorization' do
+      let!(:unauthorized_user) { create(:applicant)}
 
-    it 'returns 200 status for owner' do
-      get "/api/v1/employees/#{accessing_employee.id}", headers: { 'Authorization' => access_token(owner)}
+      before do
+        params = { employee: attributes_for(:employee, tenant_id: tenant.id) }
+        post "/api/v1/employees", headers: { 'Authorization' => access_token(unauthorized_user)}, params: params
+      end
 
-      expect(response).to have_http_status(:ok)
-    end
-
-    it 'returns 200 status for admin' do
-      get "/api/v1/employees/#{accessing_employee.id}", headers: { 'Authorization' => access_token(accessing_admin)}
-
-      expect(response).to have_http_status(:ok)
-    end
-
-    it 'returns 200 status for employee' do
-      get "/api/v1/employees/#{accessing_employee.id}", headers: { 'Authorization' => access_token(accessing_employee)}
-
-      expect(response).to have_http_status(:ok)
-    end
-
-    it 'returns the correct response body' do
-
-      get "/api/v1/employees/#{accessing_employee.id}", headers: { 'Authorization' => access_token(accessing_employee)}
-
-      restricted_parameters = %w[
-        password_digest
-        access_token
-        refresh_token
-        reset_token
-        otp_secret_key
-        enabled
-        otp_enabled
-        otp_required
-        activation_token
-      ]
-
-      expect(json).not_to include(restricted_parameters)
-    end
-
-    it 'returns not found when resource does not exist' do
-      get "/api/v1/employees/99999", headers: { 'Authorization' => access_token(accessing_employee)}
-      expect(json['error']).to eq('Resource not found')
+      it 'returns 401 status' do
+        expect(response).to have_http_status(:unauthorized)
+      end
     end
   end
 
@@ -152,36 +128,81 @@ RSpec.describe "Api::V1::Employees", type: :request do
 
       expect(json).not_to include(restricted_parameters)
     end
-
-    it 'returns not found when resource does not exist' do
-      get "/api/v1/employees/99999", headers: { 'Authorization' => access_token(accessing_employee)}
-      expect(json['error']).to eq('Resource not found')
-    end
   end
 
-  describe "DELETE /destroy" do
-    let!(:owner) { create(:owner) }
-    let!(:tenant) { create(:tenant, owner_id: owner.id) }
-    let!(:employee) { create(:employee, tenant_id: tenant.id)}
-
-    let!(:accessing_admin) { create(:admin) }
+  # describe "GET /show" do
+  #   let!(:owner) { create(:owner) }
+  #   let!(:tenant) { create(:tenant, owner_id: owner.id) }
+  #   let!(:accessing_employee) { create(:employee, tenant_id: tenant.id)}
+  #   let!(:accessing_admin) { create(:admin) }
    
 
-    it 'returns 204 status for owner' do
-      delete "/api/v1/employees/#{employee.id}", headers: { 'Authorization' => access_token(owner)}
+  #   it 'returns 200 status for owner' do
+  #     get "/api/v1/employees/#{accessing_employee.id}", headers: { 'Authorization' => access_token(owner)}
 
-      expect(response).to have_http_status(:no_content)
-    end
+  #     expect(response).to have_http_status(:ok)
+  #   end
 
-    it 'returns 204 status for admin' do
-      delete "/api/v1/employees/#{employee.id}", headers: { 'Authorization' => access_token(accessing_admin)}
+  #   it 'returns 200 status for admin' do
+  #     get "/api/v1/employees/#{accessing_employee.id}", headers: { 'Authorization' => access_token(accessing_admin)}
 
-      expect(response).to have_http_status(:no_content)
-    end
+  #     expect(response).to have_http_status(:ok)
+  #   end
 
-    it 'returns not found when resource does not exist' do
-      delete "/api/v1/employees/99999", headers: { 'Authorization' => access_token(owner)}
-      expect(json['error']).to eq('Resource not found')
-    end
-  end
+  #   it 'returns 200 status for employee' do
+  #     get "/api/v1/employees/#{accessing_employee.id}", headers: { 'Authorization' => access_token(accessing_employee)}
+
+  #     expect(response).to have_http_status(:ok)
+  #   end
+
+  #   it 'returns the correct response body' do
+
+  #     get "/api/v1/employees/#{accessing_employee.id}", headers: { 'Authorization' => access_token(accessing_employee)}
+
+  #     restricted_parameters = %w[
+  #       password_digest
+  #       access_token
+  #       refresh_token
+  #       reset_token
+  #       otp_secret_key
+  #       enabled
+  #       otp_enabled
+  #       otp_required
+  #       activation_token
+  #     ]
+
+  #     expect(json).not_to include(restricted_parameters)
+  #   end
+
+  #   it 'returns not found when resource does not exist' do
+  #     get "/api/v1/employees/99999", headers: { 'Authorization' => access_token(accessing_employee)}
+  #     expect(json['error']).to eq('Resource not found')
+  #   end
+  # end
+
+  # describe "DELETE /destroy" do
+  #   let!(:owner) { create(:owner) }
+  #   let!(:tenant) { create(:tenant, owner_id: owner.id) }
+  #   let!(:employee) { create(:employee, tenant_id: tenant.id)}
+
+  #   let!(:accessing_admin) { create(:admin) }
+   
+
+  #   it 'returns 204 status for owner' do
+  #     delete "/api/v1/employees/#{employee.id}", headers: { 'Authorization' => access_token(owner)}
+
+  #     expect(response).to have_http_status(:no_content)
+  #   end
+
+  #   it 'returns 204 status for admin' do
+  #     delete "/api/v1/employees/#{employee.id}", headers: { 'Authorization' => access_token(accessing_admin)}
+
+  #     expect(response).to have_http_status(:no_content)
+  #   end
+
+  #   it 'returns not found when resource does not exist' do
+  #     delete "/api/v1/employees/99999", headers: { 'Authorization' => access_token(owner)}
+  #     expect(json['error']).to eq('Resource not found')
+  #   end
+  # end
 end

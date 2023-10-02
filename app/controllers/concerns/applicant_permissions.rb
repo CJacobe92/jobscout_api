@@ -10,10 +10,15 @@ module ApplicantPermissions
       return allowed_roles.include?(@current_user.role)
     end
 
-    def user_scope
+    def self_read_scope
       allowed_roles = %w[ applicant ]
 
       return allowed_roles.include?(@current_user.role) && @current_applicant.id == @current_user.id
     end
 
+    def read_scope
+      allowed_roles = %w[ employer ]
+      
+      return allowed_roles.include?(@current_user.role)
+    end
 end

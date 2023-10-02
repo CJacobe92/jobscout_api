@@ -83,7 +83,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_02_101180) do
     t.string "username"
     t.string "email"
     t.string "password_digest"
-    t.string "role", default: "employers"
+    t.string "role", default: "employer"
     t.string "reset_token"
     t.string "activation_token"
     t.string "refresh_token"

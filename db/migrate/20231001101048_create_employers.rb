@@ -8,7 +8,7 @@ class CreateEmployers < ActiveRecord::Migration[7.0]
       t.string :password_digest
 
       # role
-      t.string :role, default: 'employers'
+      t.string :role, default: 'employer'
 
       # tokens and secrets
       t.string :reset_token 
