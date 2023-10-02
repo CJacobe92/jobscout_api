@@ -56,6 +56,7 @@ RSpec.describe "Api::V1::Applicants", type: :request do
 
   describe "GET /show" do
     let!(:accessing_applicant) { create(:applicant)}
+
     context 'with correct authorization' do
       before do
         get "/api/v1/applicants/#{accessing_applicant.id}", headers: { 'Authorization' => access_token(accessing_applicant)}
@@ -88,51 +89,51 @@ RSpec.describe "Api::V1::Applicants", type: :request do
     end
   end
 
-  # describe "PATCH /update" do
-  #   let!(:accessing_admin) { create(:admin) }
+  describe "PATCH /update" do
+    let!(:accessing_applicant) { create(:applicant)}
 
-  #   context 'with correct authorization' do
-  #     before do
-  #       params = { admin: { firstname: 'root' } }
-  #       patch "/api/v1/admins/#{accessing_admin.id}", headers: { 'Authorization' => access_token(accessing_admin)}, params: params
-  #     end
+    context 'with correct authorization' do
+      before do
+        params = { applicant: { firstname: 'root' } }
+        patch "/api/v1/applicants/#{accessing_applicant.id}", headers: { 'Authorization' => access_token(accessing_applicant)}, params: params
+      end
 
-  #     it 'returns 200 status' do
-  #       expect(response).to have_http_status(:ok)
-  #     end
+      it 'returns 200 status' do
+        expect(response).to have_http_status(:ok)
+      end
 
-  #     it 'returns the correct response body' do
-  #       restricted_parameters = %w[ password_digest access_token refresh_token reset_token otp_secret_key ]
+      it 'returns the correct response body' do
+        restricted_parameters = %w[ password_digest access_token refresh_token reset_token otp_secret_key ]
 
-  #       expect(json).not_to include(restricted_parameters)
-  #       expect(json['firstname']).to include('root')
-  #     end
+        expect(json).not_to include(restricted_parameters)
+        expect(json['firstname']).to include('root')
+      end
 
-  #     it 'returns not found when resource does not exist' do
-  #       get "/api/v1/admins/99999", headers: { 'Authorization' => access_token(accessing_admin)}
-  #       expect(json['error']).to eq('Resource not found')
-  #     end
-  #   end
-  # end
+      it 'returns not found when resource does not exist' do
+        get "/api/v1/applicants/99999", headers: { 'Authorization' => access_token(accessing_applicant)}
+        expect(json['error']).to eq('Resource not found')
+      end
+    end
+  end
 
-  # describe "DELETE /destroy" do
-  #   let!(:accessing_admin) { create(:admin) }
-  #   let!(:terminated_admin) { create(:admin) }
+  describe "DELETE /destroy" do
+    let!(:accessing_admin) { create(:admin) }
+    let!(:terminated_applicant) { create(:applicant) }
 
 
-  #   context 'with correct authorization' do
-  #     before do
-  #       delete "/api/v1/admins/#{terminated_admin.id}", headers: { 'Authorization' => access_token(accessing_admin)}
-  #     end
+    context 'with correct authorization' do
+      before do
+        delete "/api/v1/applicants/#{terminated_applicant.id}", headers: { 'Authorization' => access_token(accessing_admin)}
+      end
 
-  #     it 'returns no content' do
-  #       expect(response).to have_http_status(:no_content)
-  #     end
+      it 'returns no content' do
+        expect(response).to have_http_status(:no_content)
+      end
 
-  #     it 'returns not found when resource does not exist' do
-  #       get "/api/v1/admins/99999", headers: { 'Authorization' => access_token(accessing_admin)}
-  #       expect(json['error']).to eq('Resource not found')
-  #     end
-  #   end
-  # end
+      it 'returns not found when resource does not exist' do
+        get "/api/v1/applicants/99999", headers: { 'Authorization' => access_token(accessing_admin)}
+        expect(json['error']).to eq('Resource not found')
+      end
+    end
+  end
 end

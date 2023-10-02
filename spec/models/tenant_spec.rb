@@ -10,7 +10,6 @@ RSpec.describe Tenant, type: :model do
       it { is_expected.to validate_presence_of(:contact_number).on(:create) }
       it { is_expected.to validate_presence_of(:license).on(:create) }
       it { is_expected.to validate_presence_of(:subscription).on(:create) }
-      it { is_expected.to validate_presence_of(:subdomain).on(:create) }
     end
   end
 

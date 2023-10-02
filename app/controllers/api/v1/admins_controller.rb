@@ -1,39 +1,62 @@
-require './app/services/role_auth'
-
 class Api::V1::AdminsController < ApplicationController
-  include RoleAuth
+  include GlobalPermissions
+  include MessageHelper
   before_action :authenticate
-  before_action :admin_only
   before_action :load_admin, only: [ :show, :update , :destroy ]
  
   def index
-    @admins = Admin.all
-    render 'index', status: :ok
+    if global_scope
+      @admins = Admin.all
+      render 'index', status: :ok
+    else
+      render json: UNAUTHORIZED, status: :unauthorized
+    end
   end
 
   def create
-    @admin = Admin.new(admin_params)
-    
-    if @admin.save
-      render json: { message: 'Admin created'}, status: :created
+    if global_scope
+      @admin = Admin.new(admin_params)
+      
+      if @admin.save
+        render json: CREATED , status: :created
+      else
+        render json: UNPROCESSABLE_ENTITY, status: :unprocessable_entity
+      end
     else
-      render json: { error: 'Failed to create admin'}, status: :unprocessable_entity
+      render json: UNAUTHORIZED, status: :unauthorized
     end
   end
 
   def show
-    return unless @current_admin
-    render 'show', status: :ok
+    if global_scope
+      render 'show', status: :ok
+    else
+      render json: UNAUTHORIZED, status: :unauthorized
+    end
   end
 
   def update
-    return unless @current_admin.update(admin_params)
-    render 'update', status: :ok
+    if global_scope
+      if @current_admin.update(admin_params)
+         render 'update', status: :ok
+      else
+        render json: UNPROCESSABLE_ENTITY, status: :unprocessable_entity
+      end
+    else
+      render json: UNAUTHORIZED, status: :unauthorized
+    end  
   end
 
   def destroy
-    return unless @current_admin.destroy
-    head :no_content
+    if global_scope
+      if @current_admin.destroy
+         head :no_content
+      else
+        render json: DELETION_FAILED, status: :unprocessable_entity
+      end
+    else
+      render json: UNAUTHORIZED, status: :unauthorized
+    end  
   end
 
   private

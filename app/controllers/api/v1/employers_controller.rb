@@ -1,13 +1,15 @@
-require './app/services/role_auth'
-
 class Api::V1::EmployersController < ApplicationController
-  include RoleAuth
+  include EmployerPermissions
+  include MessageHelper
   before_action :load_employer, only: [:show, :update , :destroy]
-  before_action :admin_or_owner_only, [:index, :create, :destroy]
 
   def index
-    @employers = Employer.all
-    render 'index', status: :ok
+    if administration_scope
+      @employers = Employer.all
+      render 'index', status: :ok
+    else
+      render json: UNAUTHORIZED, status: :unauthorized
+    end
   end
 
   def create
@@ -21,18 +23,35 @@ class Api::V1::EmployersController < ApplicationController
   end
 
   def show
-    return unless @current_employer
-    render 'show', status: :ok
+    if user_scope || administration_scope
+      render 'show', status: :ok
+    else
+      render json: UNAUTHORIZED, status: :unauthorized
+    end
   end
 
   def update
-    return unless @current_employer.update(employer_params)
-    render 'update', status: :ok
+    if user_scope || administration_scope
+      if @current_employer.update(employer_params)
+        render 'update', status: :ok
+      else
+        render json: UNPROCESSABLE_ENTITY, status: :unprocessable_entity
+      end
+    else
+      render json: UNAUTHORIZED, status: :unauthorized
+    end
   end
 
   def destroy
-    return unless @current_employer.destroy
-    head :no_content
+    if administration_scope
+      if @current_owner.destroy
+        head :no_content
+      else
+        render json: DELETION_FAILED, status: :unprocessable_entity
+      end
+    else
+      render json: UNAUTHORIZED, status: :unauthorized
+    end
   end
 
   private
