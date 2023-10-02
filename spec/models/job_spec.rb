@@ -15,4 +15,11 @@ RSpec.describe Job, type: :model do
     end
   end
 
+  describe 'associations' do
+    it { is_expected.to have_many(:job_histories) }
+    it { is_expected.to belong_to(:employer) } 
+    it { is_expected.to belong_to(:employee).optional } 
+
+  end
+
 end

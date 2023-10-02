@@ -14,16 +14,11 @@ class CreateJobs < ActiveRecord::Migration[7.0]
       t.date :deadline
 
       # uuid
-      t.uuid :employer_id, null: false
-      t.uuid :applicant_id, null: true
-      t.uuid :employee_id, null: true
+      t.references :employer, null: false, type: :uuid, foreign_key: true
+      t.references :employee, null: true, type: :uuid, foreign_key: true
+
 
       t.timestamps
     end
-
-    add_foreign_key :jobs, :employers, column: :employer_id
-    add_foreign_key :jobs, :applicants, column: :applicant_id
-    add_foreign_key :jobs, :employees, column: :employee_id
-
   end
 end

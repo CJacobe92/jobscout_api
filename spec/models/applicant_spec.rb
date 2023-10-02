@@ -23,4 +23,9 @@ RSpec.describe Applicant, type: :model do
       end
     end
   end
+
+  describe 'associations' do
+    it { is_expected.to belong_to(:job).optional }
+    it { is_expected.to belong_to(:employer).optional }
+  end
 end

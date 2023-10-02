@@ -1,6 +1,11 @@
-class Api::V1::AdminsController < ApplicationController
-  before_action :load_admin, only: [:show, :update , :destroy]
+require './app/services/role_auth'
 
+class Api::V1::AdminsController < ApplicationController
+  include RoleAuth
+  before_action :authenticate
+  before_action :admin_only
+  before_action :load_admin, only: [ :show, :update , :destroy ]
+ 
   def index
     @admins = Admin.all
     render 'index', status: :ok
@@ -38,6 +43,10 @@ class Api::V1::AdminsController < ApplicationController
   end
   
   def load_admin
-    @current_admin = Admin.find_by(id: params[:id])
+    begin
+      @current_admin = Admin.find(params[:id])
+    rescue ActiveRecord::RecordNotFound
+      render json: { error: 'Resource not found' }, status: :not_found
+    end
   end
 end

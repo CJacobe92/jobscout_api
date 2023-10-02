@@ -1,6 +1,8 @@
 class Applicant < ApplicationRecord
   self.primary_key = 'id'
   has_secure_password
+  belongs_to :job, optional: true
+  belongs_to :employer, optional: true
 
   validates :firstname, presence: true, on: :create
   validates :lastname, presence: true, on: :create

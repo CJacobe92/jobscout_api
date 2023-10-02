@@ -1,5 +1,9 @@
+require './app/services/role_auth'
+
 class Api::V1::EmployersController < ApplicationController
+  include RoleAuth
   before_action :load_employer, only: [:show, :update , :destroy]
+  before_action :admin_or_owner_only, [:index, :create, :destroy]
 
   def index
     @employers = Employer.all
@@ -38,6 +42,10 @@ class Api::V1::EmployersController < ApplicationController
   end
   
   def load_employer
-    @current_employer = Employer.find_by(id: params[:id])
+    begin
+      @current_employer = Employer.find(params[:id])
+    rescue ActiveRecord::RecordNotFound
+      render json: { error: 'Resource not found' }, status: :not_found
+    end
   end
 end

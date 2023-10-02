@@ -4,6 +4,10 @@ json.array! @owners do |data|
     'access_token',
     'refresh_token',
     'reset_token',
-    'otp_secret_key'
+    'otp_secret_key',
+    'enabled',
+    'otp_enabled',
+    'otp_required',
+    'activation_token'
   )
 end
