@@ -21,6 +21,10 @@ class CreateApplicants < ActiveRecord::Migration[7.0]
       t.boolean :enabled, default: -> { false }
       t.boolean :otp_enabled, default: -> { false }
       t.boolean :otp_required, default: -> { true }
+
+      # uuid
+      t.references :job, null: true, type: :uuid, foreign_key: true
+      t.references :employer, null: true, type: :uuid, foreign_key: true
       
       t.timestamps
     end

@@ -1,34 +1,56 @@
 class Api::V1::ApplicantsController < ApplicationController
-  before_action :load_applicant, only: [:show, :update , :destroy]
+  include ApplicantPermissions
+  include MessageHelper
 
   def index
-    @applicants = Applicant.all
-    render 'index', status: :ok
+    if administration_scope
+      @applicants = Applicant.all
+      render 'index', status: :ok
+    else
+      render json: UNAUTHORIZED, status: :unauthorized
+    end
   end
 
   def create
     @applicant = Applicant.new(applicant_params)
     
     if @applicant.save
-      render json: { message: 'Applicant created'}, status: :created
+      render json: CREATED, status: :created
     else
-      render json: { error: 'Failed to create applicant'}, status: :unprocessable_entity
+      render json: UNPROCESSABLE_ENTITY, status: :unprocessable_entity
     end
   end
 
   def show
-    return unless @current_applicant
-    render 'show', status: :ok
+    if user_scope || administration_scope 
+      render 'show', status: :ok
+    else
+      render json: UNAUTHORIZED, status: :unauthorized
+    end
   end
 
   def update
-    return unless @current_applicant.update(applicant_params)
-    render 'update', status: :ok
+    if user_scope || administration_scope
+      if @current_applicant.update(applicant_params)
+        render 'update', status: :ok
+      else
+        render json: UNPROCESSABLE_ENTITY, status: :unprocessable_entity
+      end
+    else
+      render json: UNAUTHORIZED, status: :unauthorized
+    end
   end
 
   def destroy
-    return unless @current_applicant.destroy
-    head :no_content
+    if administration_scope
+      if @current_applicant.destroy
+        head :no_content
+      else
+        render json: DELETION_FAILED, status: :unprocessable_entity
+      end
+    else
+      render json: UNAUTHORIZED, status: :unauthorized
+    end
   end
 
   private
@@ -38,6 +60,9 @@ class Api::V1::ApplicantsController < ApplicationController
   end
   
   def load_applicant
-    @current_applicant = Applicant.find_by(id: params[:id])
+    @current_applicant = Applicant.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    render json: { error: 'Resource not found' }, status: :not_found
   end
 end
+

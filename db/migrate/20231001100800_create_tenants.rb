@@ -11,12 +11,10 @@ class CreateTenants < ActiveRecord::Migration[7.0]
       t.string :subdomain
       t.boolean :activated, defaut: -> { false }
 
-      # uuid
-      t.uuid :owner_id, null: false
-
+      # fk
+      t.references :owner, null: false, type: :uuid, foreign_key: true
+  
       t.timestamps
     end
-
-    add_foreign_key :tenants, :owners, column: :owner_id
   end
 end

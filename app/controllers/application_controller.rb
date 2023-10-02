@@ -1,32 +1,13 @@
 require './app/services/account_finder'
 require './app/services/token_helper'
+require './app/services/message_helper'
 
 class ApplicationController < ActionController::API
   include AccountFinder
   include TokenHelper
+  include MessageHelper
 
   before_action :authenticate
-
-  REQUIRES_AUTHENTICATION = {message: 'Requires authentication'}.freeze
-
-  BAD_CREDENTIALS = { message: 'Bad credentials' }.freeze
-
-  MALFORMED_AUTHORIZATION_HEADER = {
-    error: 'Malformed header',
-    error_description: 'Authorization header value must follow this format: Bearer access-token',
-    message: 'Bad credentials'
-  }.freeze
-
-  EXPIRED_TOKEN = {
-    error: 'Invalid Token',
-    error_description: 'Authenticating using an expired token',
-    message: 'Bad credentials'
-  }.freeze
-
-  MISMATCHED_TOKEN = {
-    error: 'Token mismatched',
-    message: 'Bad credentials'
-  }.freeze
 
   def authenticate
     token = token_from_request
@@ -37,12 +18,10 @@ class ApplicationController < ActionController::API
       type = validation_response[:type].downcase();
       user = validation_response[:account]
       
-
       @current_user = user if user.role == type
 
     end
   end
-
 
   private
 
@@ -72,7 +51,6 @@ class ApplicationController < ActionController::API
       email = result['email']
       account = find_account(email)
 
-  
       if expiry < Time.now
         render json: EXPIRED_TOKEN, status: :unauthorized
       elsif account&.access_token != token
@@ -82,6 +60,5 @@ class ApplicationController < ActionController::API
       { account: account, type: result['type'] }
     end
   end  
-   
-
+  
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_10_01_110059) do
+ActiveRecord::Schema[7.0].define(version: 2023_10_02_101180) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -48,8 +48,12 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_01_110059) do
     t.boolean "enabled", default: false
     t.boolean "otp_enabled", default: false
     t.boolean "otp_required", default: true
+    t.uuid "job_id"
+    t.uuid "employer_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["employer_id"], name: "index_applicants_on_employer_id"
+    t.index ["job_id"], name: "index_applicants_on_job_id"
   end
 
   create_table "employees", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -70,6 +74,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_01_110059) do
     t.uuid "tenant_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["tenant_id"], name: "index_employees_on_tenant_id"
   end
 
   create_table "employers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -90,6 +95,24 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_01_110059) do
     t.uuid "tenant_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["tenant_id"], name: "index_employers_on_tenant_id"
+  end
+
+  create_table "job_histories", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "job_name"
+    t.string "job_location"
+    t.string "job_salary"
+    t.string "job_currency"
+    t.string "job_headcount"
+    t.string "job_type"
+    t.string "job_status"
+    t.string "employer_name"
+    t.uuid "employer_id", null: false
+    t.uuid "job_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["employer_id"], name: "index_job_histories_on_employer_id"
+    t.index ["job_id"], name: "index_job_histories_on_job_id"
   end
 
   create_table "jobs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -105,10 +128,11 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_01_110059) do
     t.string "job_type"
     t.date "deadline"
     t.uuid "employer_id", null: false
-    t.uuid "applicant_id"
     t.uuid "employee_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["employee_id"], name: "index_jobs_on_employee_id"
+    t.index ["employer_id"], name: "index_jobs_on_employer_id"
   end
 
   create_table "owners", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -143,11 +167,15 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_01_110059) do
     t.uuid "owner_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["owner_id"], name: "index_tenants_on_owner_id"
   end
 
+  add_foreign_key "applicants", "employers"
+  add_foreign_key "applicants", "jobs"
   add_foreign_key "employees", "tenants"
   add_foreign_key "employers", "tenants"
-  add_foreign_key "jobs", "applicants"
+  add_foreign_key "job_histories", "employers"
+  add_foreign_key "job_histories", "jobs"
   add_foreign_key "jobs", "employees"
   add_foreign_key "jobs", "employers"
   add_foreign_key "tenants", "owners"

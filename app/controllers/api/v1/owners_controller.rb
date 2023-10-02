@@ -4,6 +4,7 @@ class Api::V1::OwnersController < ApplicationController
   include RoleAuth
   before_action :load_owner, only: [ :show, :update , :destroy ] 
   before_action :admin_only, only: [ :index, :destroy ]
+  before_action :authenticate, except: [ :create ]
 
   def index
     @owners = Owner.all
@@ -42,6 +43,10 @@ class Api::V1::OwnersController < ApplicationController
   end
   
   def load_owner
-    @current_owner = Owner.find_by(id: params[:id])
+    begin
+      @current_owner = Owner.find(params[:id])
+    rescue ActiveRecord::RecordNotFound
+      render json: { error: 'Resource not found' }, status: :not_found
+    end
   end
 end

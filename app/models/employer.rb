@@ -1,6 +1,8 @@
 class Employer < ApplicationRecord
   self.primary_key = 'id'
   has_secure_password
+  has_many :job_histories
+  has_many :applicants
   belongs_to :tenant
 
 

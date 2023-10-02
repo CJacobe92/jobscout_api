@@ -22,13 +22,10 @@ class CreateEmployees < ActiveRecord::Migration[7.0]
       t.boolean :otp_enabled, default: -> { false }
       t.boolean :otp_required, default: -> { true }
       
-      #uuid
-      t.uuid :tenant_id, null: false
+      #fk
+      t.references :tenant, null: false, type: :uuid, foreign_key: true
 
       t.timestamps
     end
-
-    add_foreign_key :employees, :tenants, column: :tenant_id
-
   end
 end

@@ -28,3 +28,64 @@ owner = Owner.create!(
   otp_required: true,
   otp_enabled: true,
 )
+
+tenant = Tenant.create!(
+  company_name: 'Test Manpower Services Inc.',
+  company_owner: 'Test Owner',
+  company_address: 'company address',
+  company_email: 'testmanpowerservices@agency.com',
+  license: '123456789',
+  contact_number: '987654321',
+  subscription: 'enterprise',
+  owner_id: owner && owner.id
+)
+
+employee = Employee.create!(
+  firstname: 'test',
+  lastname: 'employee',
+  username: 'test.employee',
+  email: 'test.employee@email.com',
+  password: 'password',
+  password_confirmation: 'password',
+  enabled: true,
+  otp_required: true,
+  otp_enabled: true,
+  tenant_id: tenant && tenant.id
+)
+
+employer = Employer.create!(
+  firstname: 'test',
+  lastname: 'employer',
+  username: 'test.employer',
+  email: 'test.employer@email.com',
+  password: 'password',
+  password_confirmation: 'password',
+  enabled: true,
+  otp_required: true,
+  otp_enabled: true,
+  tenant_id: tenant && tenant.id
+)
+
+applicant = Applicant.create!(
+  firstname: 'test1',
+  lastname: 'applicant',
+  username: 'test1.applicant',
+  email: 'test1.applicant@email.com',
+  password: 'password',
+  password_confirmation: 'password',
+  enabled: true,
+  otp_required: true,
+  otp_enabled: true,
+)
+
+applicant = Applicant.create!(
+  firstname: 'test2',
+  lastname: 'applicant',
+  username: 'test2.applicant',
+  email: 'test2.applicant@email.com',
+  password: 'password',
+  password_confirmation: 'password',
+  enabled: true,
+  otp_required: true,
+  otp_enabled: true,
+)

@@ -1,4 +1,9 @@
 class Job < ApplicationRecord
+  self.primary_key = 'id'
+  has_many :job_histories
+  belongs_to :employer
+  belongs_to :employee, optional: true
+
   validates :job_name, presence: true, on: :create
   validates :job_description, presence: true, on: :create
   validates :job_requirements, presence: true, on: :create
