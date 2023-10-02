@@ -1,11 +1,12 @@
 class Api::V1::JobsController < ApplicationController
   include JobPermissions
+  include GlobalPermissions
   include MessageHelper
   before_action :load_job, except: [:index, :create]
   before_action :authenticate, except: [:show]
 
   def index
-    if administration_scope
+    if global_scope
       @jobs = Job.all
       render json: 'index', status: :ok
     else
@@ -14,7 +15,7 @@ class Api::V1::JobsController < ApplicationController
   end
 
   def create
-    if administration_scope || user_scope
+    if administration_scope || read_scope || global_scope
       @job = Job.new(job_params)
 
       if @job.save
@@ -28,7 +29,7 @@ class Api::V1::JobsController < ApplicationController
   end
 
   def show
-    if administration_scope || user_scope
+    if read_scope || administration_scope || global_scope
       render 'show', status: :ok
     else
       render json: UNAUTHORIZED, status: :unauthorized
@@ -36,7 +37,7 @@ class Api::V1::JobsController < ApplicationController
   end
 
   def update
-    if administration_scope || user_scope
+    if administration_scope || global_scope
       @current_job.update(job_params)
       render 'update', status: :ok
     else

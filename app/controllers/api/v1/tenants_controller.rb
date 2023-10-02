@@ -1,10 +1,11 @@
 class Api::V1::TenantsController < ApplicationController
   include TenantPermissions
+  include GlobalPermissions
   include MessageHelper
   before_action :load_tenant, except: [ :index, :create ]
 
   def index
-    if administration_scope
+    if global_scope
       @tenants = Tenant.all
       render 'index', status: :ok
     else
@@ -23,7 +24,7 @@ class Api::V1::TenantsController < ApplicationController
   end
 
   def show
-    if user_scope || administration_scope
+    if self_read_scope || global_scope
       render 'show', status: :ok
     else
       render json: UNAUTHORIZED, status: :unauthorized
@@ -31,7 +32,7 @@ class Api::V1::TenantsController < ApplicationController
   end
 
   def update
-    if user_scope || administration_scope
+    if self_read_scope || global_scope
       @current_tenant.update(tenant_params)
       render 'update', status: :ok
     else
@@ -40,7 +41,7 @@ class Api::V1::TenantsController < ApplicationController
   end
 
   def destroy
-    if administration_scope
+    if global_scope
       @current_tenant.destroy
       head :no_content
     else
