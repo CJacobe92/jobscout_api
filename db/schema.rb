@@ -151,8 +151,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_02_101180) do
   create_table "tenants", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "company_name"
     t.string "company_address"
-    t.string "firstname"
-    t.string "lastname"
+    t.string "principal"
     t.string "company_email"
     t.string "license"
     t.string "contact_number"

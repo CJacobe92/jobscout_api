@@ -15,7 +15,7 @@ RSpec.describe "Api::V1::Tenants", type: :request do
 
     it 'returns correct json data' do
       json.map do |data|
-        expect(data.size).to eq(13)
+        expect(data.size).to eq(12)
       end
     end
 

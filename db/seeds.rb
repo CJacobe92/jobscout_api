@@ -19,8 +19,7 @@ admin = Admin.create!(
 
 tenant = Tenant.create!(
   company_name: 'Test Manpower Services Inc.',
-  firstname: 'test',
-  lastname: 'owner',
+  principal: 'test owner',
   company_address: 'company address',
   company_email: 'testmanpowerservices@agency.com',
   license: '123456789',

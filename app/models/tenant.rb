@@ -6,8 +6,7 @@ class Tenant < ApplicationRecord
   has_many :owners
 
   validates :company_name, presence: true, on: :create, uniqueness: true
-  validates :firstname, presence: true, on: :create
-  validates :lastname, presence: true, on: :create
+  validates :principal, presence: true, on: :create
   validates :company_address, presence: true, on: :create
   validates :company_email, presence: true, on: :create
   validates :license, presence: true, on: :create
