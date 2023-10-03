@@ -9,10 +9,4 @@ module EmployerPermissions
 
       return allowed_roles.include?(@current_user.role)
     end
-
-    def self_read_scope
-      allowed_roles = %w[ employer ]
-
-      return allowed_roles.include?(@current_user.role) && @current_employer.id == @current_user.id
-    end
 end

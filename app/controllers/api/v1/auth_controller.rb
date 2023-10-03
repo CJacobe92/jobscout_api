@@ -30,7 +30,7 @@ class Api::V1::AuthController < ApplicationController
   end
 
   def handle_successful_signin(account)
-    payload = {email: account&.email, type: account&.class.name}
+    payload = {email: account&.email, role: account.role}
     access_token = encode_access_token(payload)
     refresh_token = encode_refresh_token(payload)
 

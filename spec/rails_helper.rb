@@ -7,6 +7,7 @@
   # require './app/modules/error_messages'
   require './spec/helpers/json_helper'
   require './spec/helpers/auth_helper'
+  require './app/services/token_helper'
   require 'timecop'
   require 'rspec/rails'
   require 'simplecov'
@@ -43,6 +44,7 @@
     config.include FactoryBot::Syntax::Methods
     config.include JsonHelper
     config.include AuthHelper
+    config.include TokenHelper
     
     # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
     config.fixture_path = "#{::Rails.root}/spec/fixtures"

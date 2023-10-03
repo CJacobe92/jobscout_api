@@ -1,21 +1,21 @@
 class Api::V1::JobsController < ApplicationController
-  include JobPermissions
   include GlobalPermissions
+  include JobPermissions
   include MessageHelper
   before_action :load_job, except: [:index, :create]
   before_action :authenticate, except: [:show]
 
   def index
     if global_scope
-      @jobs = Job.all
-      render json: 'index', status: :ok
+      @jobs = Job.includes(:employer)
+      render 'index', status: :ok
     else
       render json: UNAUTHORIZED, status: :unauthorized
     end
   end
 
   def create
-    if administration_scope || read_scope || global_scope
+    if administration_scope || global_scope
       @job = Job.new(job_params)
 
       if @job.save
@@ -29,11 +29,7 @@ class Api::V1::JobsController < ApplicationController
   end
 
   def show
-    if read_scope || administration_scope || global_scope
-      render 'show', status: :ok
-    else
-      render json: UNAUTHORIZED, status: :unauthorized
-    end
+    render 'show', status: :ok
   end
 
   def update
@@ -46,7 +42,7 @@ class Api::V1::JobsController < ApplicationController
   end
 
   def destroy
-    if administration_scope || user_scope
+    if administration_scope || global_scope
       @current_job.destroy
       head :no_content
     else
@@ -57,10 +53,14 @@ class Api::V1::JobsController < ApplicationController
   private
 
   def job_params
-    params.require(:job).permit(:job_name, :job_description, :job_requirements, :job_headcount, :job_salary, :job_currency, :job_status, :job_location, :job_type, :deadline)
+    params.require(:job).permit(:job_name, :job_description, :job_requirement, :job_headcount, :job_salary, :job_currency, :job_status, :job_location, :job_type, :deadline, :employer_id)
   end
 
   def load_job
-    @current_job = Job.find_by(id: params[:id])
+    begin
+      @current_job = Job.find(params[:id])
+    rescue ActiveRecord::RecordNotFound
+      render json: { error: 'Resource not found' }, status: :not_found
+    end
   end
 end

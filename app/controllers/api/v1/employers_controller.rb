@@ -13,17 +13,21 @@ class Api::V1::EmployersController < ApplicationController
   end
 
   def create
-    @employer = Employer.new(employer_params)
-    
-    if @employer.save
-      render json: { message: 'Employer created'}, status: :created
+    if administration_scope
+      @employer = Employer.new(employer_params)
+      
+      if @employer.save
+        render json: CREATED, status: :created
+      else
+        render json: UNPROCESSABLE_ENTITY, status: :unprocessable_entity
+      end
     else
-      render json: { error: 'Failed to create employer'}, status: :unprocessable_entity
+      render json: UNAUTHORIZED, status: :unauthorized
     end
   end
 
   def show
-    if self_read_scope || administration_scope
+    if administration_scope
       render 'show', status: :ok
     else
       render json: UNAUTHORIZED, status: :unauthorized
@@ -31,7 +35,7 @@ class Api::V1::EmployersController < ApplicationController
   end
 
   def update
-    if self_read_scope || administration_scope
+    if administration_scope
       @current_employer.update(employer_params)
       render 'update', status: :ok
     else
@@ -41,7 +45,7 @@ class Api::V1::EmployersController < ApplicationController
 
   def destroy
     if administration_scope
-      @current_owner.destroy
+      @current_employer.destroy
       head :no_content
     else
       render json: UNAUTHORIZED, status: :unauthorized
@@ -51,7 +55,7 @@ class Api::V1::EmployersController < ApplicationController
   private
 
   def employer_params
-    params.require(:employer).permit(:firstname, :lastname, :username, :email, :password, :password_confirmation)
+    params.require(:employer).permit(:company_name, :company_hq, :company_email, :company_phone, :company_poc, :tenant_id)
   end
   
   def load_employer

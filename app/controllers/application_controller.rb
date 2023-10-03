@@ -13,13 +13,11 @@ class ApplicationController < ActionController::API
     token = token_from_request
 
     if token
-    
       validation_response = validate_token(token)
-      type = validation_response[:type].downcase();
+      role = validation_response[:role];
       user = validation_response[:account]
       
-      @current_user = user if user.role == type
-
+      @current_user = user if user.role == role
     end
   end
 
@@ -37,11 +35,11 @@ class ApplicationController < ActionController::API
       render json: MALFORMED_AUTHORIZATION_HEADER, status: :forbidden and return
     end
 
-   scheme, token = authorization_header
+    scheme, token = authorization_header
 
-   render json: BAD_CREDENTIALS, status: :forbidden and return unless scheme.downcase == 'bearer'
+    render json: BAD_CREDENTIALS, status: :forbidden and return unless scheme.downcase == 'bearer'
 
-   token
+    token
   end
 
   def validate_token(token)
@@ -49,6 +47,7 @@ class ApplicationController < ActionController::API
       result = decode_token(token)
       expiry = result['expiry']
       email = result['email']
+      role = result['role']
       account = find_account(email)
 
       if expiry < Time.now
@@ -57,7 +56,7 @@ class ApplicationController < ActionController::API
         render json: MISMATCHED_TOKEN, status: :unauthorized
       end
     
-      { account: account, type: result['type'] }
+      { account: account, role: role }
     end
   end  
 

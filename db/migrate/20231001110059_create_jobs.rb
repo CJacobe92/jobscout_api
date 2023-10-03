@@ -3,7 +3,7 @@ class CreateJobs < ActiveRecord::Migration[7.0]
     create_table :jobs, id: :uuid do |t|
       t.string :job_name
       t.text :job_description
-      t.text :job_requirements
+      t.text :job_requirement
       t.integer :job_headcount
       t.string :job_salary
       t.string :job_currency

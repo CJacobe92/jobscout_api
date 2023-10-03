@@ -3,12 +3,11 @@ require 'rails_helper'
 RSpec.describe Employer, type: :model do
   describe 'validations' do
     context 'initial validations' do
-      it { is_expected.to validate_presence_of(:firstname).on(:create) }
-      it { is_expected.to validate_presence_of(:lastname).on(:create) }
-      it { is_expected.to validate_presence_of(:username).on(:create) }
-      it { is_expected.to validate_presence_of(:email).on(:create) }
-      it { is_expected.to validate_presence_of(:password).on(:create) }
-      it { is_expected.to validate_presence_of(:password_confirmation).on(:create) }
+      it { is_expected.to validate_presence_of(:company_name).on(:create) }
+      it { is_expected.to validate_presence_of(:company_hq).on(:create) }
+      it { is_expected.to validate_presence_of(:company_email).on(:create) }
+      it { is_expected.to validate_presence_of(:company_phone).on(:create) }
+      it { is_expected.to validate_presence_of(:company_poc).on(:create) }
     end
 
     context 'further validations' do

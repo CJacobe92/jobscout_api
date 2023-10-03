@@ -1,10 +1,9 @@
 FactoryBot.define do
   factory :employer do
-    sequence(:firstname) { |n| "test#{n}" }
-    sequence(:lastname) { "employer" }
-    sequence(:username) { |n| "test#{n}.employer" }
-    sequence(:email) { |n| "test#{n}.employer@email.com"}
-    sequence(:password) { "password" }
-    sequence(:password_confirmation) { "password" }
+    sequence(:company_name) { |n| "test#{n}" }
+    sequence(:company_hq) { |n| "company hq#{n}" }
+    sequence(:company_email) { |n| "company#{n}.email@email.com"}
+    sequence(:company_phone) { "12345678" }
+    sequence(:company_poc) { "John Doe" }
   end
 end

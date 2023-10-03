@@ -3,6 +3,7 @@ class Api::V1::TenantsController < ApplicationController
   include GlobalPermissions
   include MessageHelper
   before_action :load_tenant, except: [ :index, :create ]
+  before_action :authenticate
 
   def index
     if global_scope
@@ -14,12 +15,16 @@ class Api::V1::TenantsController < ApplicationController
   end
 
   def create
-    @tenant = Tenant.create(tenant_params)
+    if guest_scope || global_scope
+      @tenant = Tenant.create(tenant_params)
 
-    if @tenant.save
-      render json: CREATED, status: :created
+      if @tenant.save
+        render json: CREATED, status: :created
+      else
+        render json: UNPROCESSABLE_ENTITY, status: :unprocessable_entity
+      end
     else
-      render json: UNPROCESSABLE_ENTITY, status: :unprocessable_entiy
+       render json: UNAUTHORIZED, status: :unauthorized
     end
   end
 
@@ -52,7 +57,7 @@ class Api::V1::TenantsController < ApplicationController
   private
 
   def tenant_params
-    params.require(:tenant).permit(:company_name, :company_owner, :company_address, :company_email, :license, :contact_number, :subscription, :subdomain, :activated, :tenant_id)
+    params.require(:tenant).permit(:company_name, :company_owner, :company_address, :company_email, :license, :contact_number, :subscription, :subdomain, :activated, :owner_id)
   end
 
   def load_tenant

@@ -78,20 +78,12 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_02_101180) do
   end
 
   create_table "employers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "firstname"
-    t.string "lastname"
-    t.string "username"
-    t.string "email"
-    t.string "password_digest"
-    t.string "role", default: "employer"
-    t.string "reset_token"
-    t.string "activation_token"
-    t.string "refresh_token"
-    t.string "access_token"
-    t.string "otp_secret_key"
-    t.boolean "enabled", default: false
-    t.boolean "otp_enabled", default: false
-    t.boolean "otp_required", default: true
+    t.string "company_name"
+    t.string "company_hq"
+    t.string "company_address"
+    t.string "company_email"
+    t.string "company_phone"
+    t.string "company_poc"
     t.uuid "tenant_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -118,7 +110,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_02_101180) do
   create_table "jobs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "job_name"
     t.text "job_description"
-    t.text "job_requirements"
+    t.text "job_requirement"
     t.integer "job_headcount"
     t.string "job_salary"
     t.string "job_currency"

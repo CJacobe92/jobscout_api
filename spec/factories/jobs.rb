@@ -2,7 +2,7 @@ FactoryBot.define do
   factory :job do
     sequence(:job_name) { |n| "Job name#{n}" }
     sequence(:job_description) { |n| "Job Description#{n}" }
-    sequence(:job_requirements) { |n| "Job Requirement#{n}" }
+    sequence(:job_requirement) { |n| "Job Requirement#{n}" }
     sequence(:job_headcount) { "100" }
     sequence(:job_salary)  { "1000" }
     sequence(:job_currency) { "USD" }

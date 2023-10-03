@@ -3,7 +3,6 @@ class Api::V1::OwnersController < ApplicationController
   include GlobalPermissions
   include MessageHelper
   before_action :load_owner, only: [ :show, :update , :destroy ] 
-  before_action :admin_only, only: [ :index, :destroy ]
   before_action :authenticate, except: [ :create ]
 
   def index
@@ -46,8 +45,6 @@ class Api::V1::OwnersController < ApplicationController
     if global_scope
       if @current_owner.destroy
         head :no_content
-      else
-        render json: DELETION_FAILED, status: :unprocessable_entity
       end
     else
       render json: UNAUTHORIZED, status: :unauthorized

@@ -8,6 +8,7 @@ Rails.application.routes.draw do
       resources :employers
       resources :employees
       resources :applicants
+      resources :tenants
 
       resources :auth, only: [] do
         collection do

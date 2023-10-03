@@ -5,7 +5,7 @@ class Api::V1::EmployeesController < ApplicationController
 
   def index
     if administration_scope
-      @Employees = Employee.all
+      @employees = Employee.all
       render 'index', status: :ok
     else
       render json: UNAUTHORIZED, status: :unauthorized
