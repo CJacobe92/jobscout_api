@@ -21,7 +21,7 @@ Rails.application.configure do
 
   # Disable serving static files from the `/public` folder by default since
   # Apache or NGINX already handles this.
-  config.public_file_server.enabled = ENV["RAILS_SERVE_STATIC_FILES"].present?
+  config.public_file_server.enabled = ENV['RAILS_SERVE_STATIC_FILES'].present? || ENV['RENDER'].present?
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
   # config.asset_host = "http://assets.example.com"
@@ -83,4 +83,21 @@ Rails.application.configure do
 
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
+
+  GMAIL_USERNAME = Rails.application.credentials.smtp[:gmail_username]
+  GMAIL_PASSWORD = Rails.application.credentials.smtp[:gmail_password]
+
+  config.action_mailer.raise_delivery_errors = true
+  config.action_mailer.default_url_options = { host: "https://jobscout-fe.vercel.app", protocol: "https" }
+  config.action_mailer.perform_deliveries = true
+  config.action_mailer.default :charset => "utf-8"
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address: "smtp.gmail.com",
+    port: 587,
+    user_name: GMAIL_USERNAME,
+    password:  GMAIL_PASSWORD,
+    authentication: :plain,
+    enable_starttls_auto: true
+  }
 end
