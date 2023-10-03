@@ -33,10 +33,7 @@ RSpec.describe "Api::V1::Applicants", type: :request do
       end
 
       context 'with incorrect authorization' do
-
         let!(:unauthorized_user) { create(:applicant)}
-        let!(:admin) { create(:admin) }
-  
   
         before do
           get "/api/v1/applicants", headers: { 'Authorization' => access_token(unauthorized_user)}
@@ -70,8 +67,8 @@ RSpec.describe "Api::V1::Applicants", type: :request do
   end
 
   describe "GET /show" do
-    let!(:owner) { create(:owner) }
-    let!(:tenant) { create(:tenant, owner_id: owner.id) }
+    let!(:tenant) { create(:tenant) }
+    let!(:owner) { create(:owner, tenant_id: tenant.id) }
     let!(:employee) { create(:employee, tenant_id: tenant.id) }
     let!(:applicant) { create(:applicant) }
     let!(:admin) { create(:admin) }
@@ -120,9 +117,6 @@ RSpec.describe "Api::V1::Applicants", type: :request do
     end
 
     context 'with incorrect authorization' do
-      let!(:owner) { create(:owner) }
-      let!(:tenant) { create(:tenant, owner_id: owner.id) }
-      let!(:applicant) { create(:applicant) }
       let!(:unauthorized_user) { create(:applicant) }
       
       before do
@@ -136,8 +130,8 @@ RSpec.describe "Api::V1::Applicants", type: :request do
   end
 
   describe "PATCH /update" do
-    let!(:owner) { create(:owner) }
-    let!(:tenant) { create(:tenant, owner_id: owner.id) }
+    let!(:tenant) { create(:tenant) }
+    let!(:owner) { create(:owner, tenant_id: tenant.id) }
     let!(:employee) { create(:employee, tenant_id: tenant.id) }
     let!(:applicant) { create(:applicant) }
     let!(:admin) { create(:admin) }
@@ -199,11 +193,8 @@ RSpec.describe "Api::V1::Applicants", type: :request do
    end
 
     context 'with incorrect authorization' do
-      let!(:owner) { create(:owner) }
-      let!(:tenant) { create(:tenant, owner_id: owner.id) }
-      let!(:applicant) { create(:applicant) }
-      let!(:unauthorized_user) { create(:applicant) }
-      
+      let!(:unauthorized_user) { create(:applicant) } 
+
       before do
         params = {applicant: { firstname: 'root'} }
         patch "/api/v1/applicants/#{applicant.id}", headers: { 'Authorization' => access_token(unauthorized_user)}, params: params
@@ -216,8 +207,8 @@ RSpec.describe "Api::V1::Applicants", type: :request do
   end
 
   describe "DELETE /destroy" do
-    let!(:owner) { create(:owner) }
-    let!(:tenant) { create(:tenant, owner_id: owner.id) }
+    let!(:tenant) { create(:tenant) }
+    let!(:owner) { create(:owner, tenant_id: tenant.id) }
     let!(:employee) { create(:employee, tenant_id: tenant.id) }
     let!(:applicant) { create(:applicant) }
     let!(:admin) { create(:admin) }
@@ -243,9 +234,6 @@ RSpec.describe "Api::V1::Applicants", type: :request do
     end
 
     context 'with incorrect authorization' do
-      let!(:owner) { create(:owner) }
-      let!(:tenant) { create(:tenant, owner_id: owner.id) }
-      let!(:applicant) { create(:applicant) }
       let!(:unauthorized_user) { create(:applicant) }
       
       before do

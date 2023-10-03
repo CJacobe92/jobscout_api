@@ -1,7 +1,8 @@
 FactoryBot.define do
   factory :tenant do
     sequence(:company_name) { |n| "company#{n}" }
-    sequence(:company_owner) { |n| "tenant user#{n}"}
+    sequence(:firstname) { |n| "tenant#{n}"}
+    sequence(:lastname) { |n| "owner#{n}"}
     sequence(:company_address) { |n| "address#{n}" } 
     sequence(:company_email) { |n| "tenant#{n}@company.com"}
     sequence(:license) { |n| "license#{n}" }

@@ -4,7 +4,8 @@ RSpec.describe Tenant, type: :model do
   describe 'validations' do
     context 'initial validations' do
       it { is_expected.to validate_presence_of(:company_name).on(:create) }
-      it { is_expected.to validate_presence_of(:company_owner).on(:create) }
+      it { is_expected.to validate_presence_of(:firstname).on(:create) }
+      it { is_expected.to validate_presence_of(:lastname).on(:create) }
       it { is_expected.to validate_presence_of(:company_address).on(:create) }
       it { is_expected.to validate_presence_of(:company_email).on(:create) }
       it { is_expected.to validate_presence_of(:contact_number).on(:create) }
@@ -14,7 +15,7 @@ RSpec.describe Tenant, type: :model do
   end
 
   describe 'associations' do
-    it { is_expected.to belong_to(:owner) }
+    it { is_expected.to have_many(:owners) }
     it { is_expected.to have_many(:employees) }
     it { is_expected.to have_many(:employers) }
   end

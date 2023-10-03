@@ -35,8 +35,8 @@ RSpec.describe "Api::V1::Admins", type: :request do
     end
 
     context 'with incorrect authorization' do
-
-      let!(:owner) { create(:owner) }
+      let!(:tenant) { create(:tenant) }
+      let!(:owner) { create(:owner, tenant_id: tenant.id) }
 
       before do
         get '/api/v1/admins', headers: { 'Authorization' => access_token(owner)}
@@ -70,7 +70,8 @@ RSpec.describe "Api::V1::Admins", type: :request do
 
     context 'with incorrect authorization' do
 
-      let!(:owner) { create(:owner) }
+      let!(:tenant) { create(:tenant) }
+      let!(:owner) { create(:owner, tenant_id: tenant.id) }
 
       before do
         params = { admin: attributes_for(:admin) }
@@ -115,8 +116,8 @@ RSpec.describe "Api::V1::Admins", type: :request do
     end
 
     context 'with incorrect authorization' do
-
-      let!(:unauthorized_user) { create(:owner) }
+      let!(:tenant) { create(:tenant) }
+      let!(:unauthorized_user) { create(:owner, tenant_id: tenant.id) }
       let!(:admin) { create(:admin) }
 
 
@@ -163,9 +164,9 @@ RSpec.describe "Api::V1::Admins", type: :request do
 
     context 'with incorrect authorization' do
 
-      let!(:unauthorized_user) { create(:owner) }
+      let!(:tenant) { create(:tenant) }
+      let!(:unauthorized_user) { create(:owner, tenant_id: tenant.id) }
       let!(:admin) { create(:admin) }
-
 
       before do
         params = { admin: { firstname: 'root' } }
@@ -194,10 +195,10 @@ RSpec.describe "Api::V1::Admins", type: :request do
     end
 
     context 'with incorrect authorization' do
-
-      let!(:unauthorized_user) { create(:owner) }
+      
+      let!(:tenant) { create(:tenant) }
+      let!(:unauthorized_user) { create(:owner, tenant_id: tenant.id) }
       let!(:admin) { create(:admin) }
-
 
       before do
         delete "/api/v1/admins/#{admin.id}", headers: { 'Authorization' => access_token(unauthorized_user)}

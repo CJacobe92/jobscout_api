@@ -2,8 +2,7 @@ require 'rails_helper'
 
 RSpec.describe "Api::V1::Employees", type: :request do
   describe "GET /index" do
-    let!(:owner) { create(:owner) }
-    let!(:tenant) { create(:tenant, owner_id: owner.id) }
+    let!(:tenant) { create(:tenant) }
     let!(:existing_employees) { create_list(:employee, 10, tenant_id: tenant.id) }
     let!(:admin) { create(:admin) }
 
@@ -50,9 +49,8 @@ RSpec.describe "Api::V1::Employees", type: :request do
   end
 
   describe "POST /create" do
-
-    let!(:owner) { create(:owner) }
-    let!(:tenant) { create(:tenant, owner_id: owner.id) }
+    let!(:tenant) { create(:tenant) }
+    let!(:owner) { create(:owner, tenant_id: tenant.id) }
     let!(:admin) { create(:admin) }
     
     context 'with correct authorization' do
@@ -91,8 +89,8 @@ RSpec.describe "Api::V1::Employees", type: :request do
   end
 
   describe "GET /show" do
-    let!(:owner) { create(:owner) }
-    let!(:tenant) { create(:tenant, owner_id: owner.id) }
+    let!(:tenant) { create(:tenant) }
+    let!(:owner) { create(:owner, tenant_id: tenant.id) }
     let!(:employee) { create(:employee, tenant_id: tenant.id)}
     let!(:admin) { create(:admin) }
    
@@ -149,8 +147,8 @@ RSpec.describe "Api::V1::Employees", type: :request do
   end
 
   describe "PATCH /update" do
-    let!(:owner) { create(:owner) }
-    let!(:tenant) { create(:tenant, owner_id: owner.id) }
+    let!(:tenant) { create(:tenant) }
+    let!(:owner) { create(:owner, tenant_id: tenant.id) }
     let!(:employee) { create(:employee, tenant_id: tenant.id)}
     let!(:admin) { create(:admin) }
    
@@ -215,8 +213,8 @@ RSpec.describe "Api::V1::Employees", type: :request do
   end
 
   describe "DELETE /destroy" do
-    let!(:owner) { create(:owner) }
-    let!(:tenant) { create(:tenant, owner_id: owner.id) }
+    let!(:tenant) { create(:tenant) }
+    let!(:owner) { create(:owner, tenant_id: tenant.id) }
     let!(:employee) { create(:employee, tenant_id: tenant.id)}
     let!(:admin) { create(:admin) }
    
@@ -248,9 +246,9 @@ RSpec.describe "Api::V1::Employees", type: :request do
   end
 
   describe 'load_employee' do
-    let!(:owner) { create(:owner) }
-    let!(:tenant) { create(:tenant, owner_id: owner.id) }
-    let!(:employee) { create(:employee, tenant_id: tenant.id) }
+    let!(:tenant) { create(:tenant) }
+    let!(:owner) { create(:owner, tenant_id: tenant.id) }
+    let!(:employee) { create(:employee, tenant_id: tenant.id)}
 
     it 'returns not found when resource does not exist' do
       get "/api/v1/employees/99999", headers: { 'Authorization' => access_token(employee)}

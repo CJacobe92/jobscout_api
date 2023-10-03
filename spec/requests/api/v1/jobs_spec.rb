@@ -2,15 +2,13 @@ require 'rails_helper'
 
 RSpec.describe "Api::V1::Jobs", type: :request do
   describe "GET /index" do
-    let!(:owner) { create(:owner) }
-    let!(:tenant) { create(:tenant, owner_id: owner.id) }
+    let!(:tenant) { create(:tenant) }
     let!(:employer) { create(:employer, tenant_id: tenant.id) }
-    let!(:existing_jobs) { create_list(:job, 10, employer_id: employer.id) }
-    let!(:admin) { create(:admin) }
-
+    let!(:jobs) { create_list(:job, 10, employer_id: employer.id) }
+  
     context 'with correct authorization' do
       before do
-        get '/api/v1/jobs', headers: { "Authorization" => access_token(admin) }
+        get '/api/v1/jobs'
       end
 
       it 'returns 200 status' do
@@ -23,23 +21,11 @@ RSpec.describe "Api::V1::Jobs", type: :request do
         end
       end
     end
-
-    context 'with incorrect authorization' do
-      let!(:unauthorized_user) { create(:applicant)}
-
-      before do
-        get '/api/v1/jobs', headers: { 'Authorization' => access_token(unauthorized_user)}
-      end
-
-      it 'returns 401 status' do
-        expect(response).to have_http_status(:unauthorized)
-      end
-    end
   end
 
   describe "POST /create" do
-    let!(:owner) { create(:owner) }
-    let!(:tenant) { create(:tenant, owner_id: owner.id) }
+    let!(:tenant) { create(:tenant) }
+    let!(:owner) { create(:owner, tenant_id: tenant.id) }
     let!(:employee) { create(:employee, tenant_id: tenant.id) }
     let!(:employer) { create(:employer, tenant_id: tenant.id) }
     let!(:admin) { create(:admin) }
@@ -89,19 +75,18 @@ RSpec.describe "Api::V1::Jobs", type: :request do
   end
 
   describe 'GET /show' do
-    let!(:owner) { create(:owner) }
-    let!(:tenant) { create(:tenant, owner_id: owner.id) }
+    let!(:tenant) { create(:tenant) }
     let!(:employer) { create(:employer, tenant_id: tenant.id) }
     let!(:job) { create(:job, employer_id: employer.id) }
     
-    it 'returns 201 status for owner' do
+    it 'returns 201 status for everyone' do
       get "/api/v1/jobs/#{job.id}"
     end
   end
 
   describe "PATCH /update" do
-    let!(:owner) { create(:owner) }
-    let!(:tenant) { create(:tenant, owner_id: owner.id) }
+    let!(:tenant) { create(:tenant) }
+    let!(:owner) { create(:owner, tenant_id: tenant.id) }
     let!(:employee) { create(:employee, tenant_id: tenant.id) }
     let!(:employer) { create(:employer, tenant_id: tenant.id) }
     let!(:job) { create(:job, employer_id: employer.id) }
@@ -145,8 +130,8 @@ RSpec.describe "Api::V1::Jobs", type: :request do
   end
 
   describe "DELETE /destroy" do
-    let!(:owner) { create(:owner) }
-    let!(:tenant) { create(:tenant, owner_id: owner.id) }
+    let!(:tenant) { create(:tenant) }
+    let!(:owner) { create(:owner, tenant_id: tenant.id) }
     let!(:employee) { create(:employee, tenant_id: tenant.id) }
     let!(:employer) { create(:employer, tenant_id: tenant.id) }
     let!(:job) { create(:job, employer_id: employer.id) }
@@ -159,7 +144,7 @@ RSpec.describe "Api::V1::Jobs", type: :request do
         expect(response).to have_http_status(:no_content)
       end
 
-      it 'returns 204 status for owner' do
+      it 'returns 204 status for employee' do
         delete "/api/v1/jobs/#{job.id}", headers: { "Authorization" => access_token(employee) }
 
         expect(response).to have_http_status(:no_content)
@@ -186,8 +171,9 @@ RSpec.describe "Api::V1::Jobs", type: :request do
   end
 
   describe 'load_employee' do
-    let!(:owner) { create(:owner) }
-
+    let!(:tenant) { create(:tenant) }
+    let!(:owner) { create(:owner, tenant_id: tenant.id) }
+    
     it 'returns not found when resource does not exist' do
       get "/api/v1/jobs/99999", headers: { 'Authorization' => access_token(owner)}
       expect(json['error']).to eq('Resource not found')

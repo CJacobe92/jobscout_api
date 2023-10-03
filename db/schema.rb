@@ -142,24 +142,25 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_02_101180) do
     t.boolean "enabled", default: false
     t.boolean "otp_enabled", default: false
     t.boolean "otp_required", default: true
+    t.uuid "tenant_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["tenant_id"], name: "index_owners_on_tenant_id"
   end
 
   create_table "tenants", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "company_name"
-    t.string "company_owner"
     t.string "company_address"
+    t.string "firstname"
+    t.string "lastname"
     t.string "company_email"
     t.string "license"
     t.string "contact_number"
     t.string "subscription"
     t.string "subdomain"
     t.boolean "activated"
-    t.uuid "owner_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["owner_id"], name: "index_tenants_on_owner_id"
   end
 
   add_foreign_key "applicants", "employers"
@@ -170,5 +171,5 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_02_101180) do
   add_foreign_key "job_histories", "jobs"
   add_foreign_key "jobs", "employees"
   add_foreign_key "jobs", "employers"
-  add_foreign_key "tenants", "owners"
+  add_foreign_key "owners", "tenants"
 end
