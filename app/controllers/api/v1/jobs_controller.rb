@@ -3,15 +3,11 @@ class Api::V1::JobsController < ApplicationController
   include JobPermissions
   include MessageHelper
   before_action :load_job, except: [:index, :create]
-  before_action :authenticate, except: [:show]
+  before_action :authenticate, except: [:show, :index]
 
   def index
-    if global_scope
-      @jobs = Job.includes(:employer)
-      render 'index', status: :ok
-    else
-      render json: UNAUTHORIZED, status: :unauthorized
-    end
+    @jobs = Job.includes(:employer)
+    render 'index', status: :ok
   end
 
   def create
