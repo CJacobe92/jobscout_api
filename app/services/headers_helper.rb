@@ -7,7 +7,7 @@ module HeadersHelper
       "enabled" => account&.enabled,
       "otp_enabled" =>  account&.otp_enabled,
       "otp_required" => account&.otp_required,
-      "user_type" => account&.role
+      "role" => account&.role
     )
   end
 end

@@ -7,7 +7,7 @@ module AuthHelper
 
   def access_token(payload)
     account = find_account(payload)
-    payload_to_encode = { email: account.email, type: account.role } 
+    payload_to_encode = { email: account.email, role: account.role } 
     access_token = encode_access_token(payload_to_encode)
     account.update(access_token: access_token)
     return "Bearer #{access_token}"

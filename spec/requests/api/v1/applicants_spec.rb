@@ -73,7 +73,6 @@ RSpec.describe "Api::V1::Applicants", type: :request do
     let!(:owner) { create(:owner) }
     let!(:tenant) { create(:tenant, owner_id: owner.id) }
     let!(:employee) { create(:employee, tenant_id: tenant.id) }
-    let!(:employer) { create(:employer, tenant_id: tenant.id) }
     let!(:applicant) { create(:applicant) }
     let!(:admin) { create(:admin) }
    
@@ -97,11 +96,6 @@ RSpec.describe "Api::V1::Applicants", type: :request do
 
       it 'returns 200 status for employee' do
         get "/api/v1/applicants/#{applicant.id}", headers: { 'Authorization' => access_token(employee)}
-        expect(response).to have_http_status(:ok)
-      end
-
-      it 'returns 200 status for employer' do
-        get "/api/v1/applicants/#{applicant.id}", headers: { 'Authorization' => access_token(employer)}
         expect(response).to have_http_status(:ok)
       end
 

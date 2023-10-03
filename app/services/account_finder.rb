@@ -9,9 +9,6 @@ module AccountFinder
     employee = find_employee(credential)
     return employee if employee
 
-    employer = find_employer(credential)
-    return employer if employer
-
     applicant = find_applicant(credential)
     return applicant if applicant
   end
@@ -53,19 +50,6 @@ module AccountFinder
     return username if username
 
     id = Employee.find_by(id: credential)
-    return id if id
-
-    nil
-  end
-
-  def find_employer(credential)
-    email = Employer.find_by(email: credential)
-    return email if email
-
-    username = Employer.find_by(username: credential)
-    return username if username
-
-    id = Employer.find_by(id: credential)
     return id if id
 
     nil

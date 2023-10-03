@@ -9,3 +9,4 @@ json.merge! @current_employee.attributes.except(
   'otp_required',
   'activation_token'
 )
+  

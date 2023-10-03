@@ -26,7 +26,7 @@ class Api::V1::ApplicantsController < ApplicationController
   end
 
   def show
-    if read_scope || self_read_scope || administration_scope
+    if self_read_scope || administration_scope
       render 'show', status: :ok
     else
       render json: UNAUTHORIZED, status: :unauthorized
