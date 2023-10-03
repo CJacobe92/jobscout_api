@@ -14,7 +14,7 @@ class Api::V1::OwnersController < ApplicationController
     end
   end
 
-  def create
+  def create 
     @owner = Owner.new(owner_params)
     
     if @owner.save
@@ -54,7 +54,7 @@ class Api::V1::OwnersController < ApplicationController
   private
 
   def owner_params
-    params.require(:owner).permit(:firstname, :lastname, :username, :email, :password, :password_confirmation)
+    params.require(:owner).permit(:firstname, :lastname, :username, :email, :password, :password_confirmation, :tenant_id)
   end
   
   def load_owner

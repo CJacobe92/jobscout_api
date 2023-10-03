@@ -2,8 +2,8 @@ require 'rails_helper'
 
 RSpec.describe "Api::V1::Owners", type: :request do
   describe "GET /index" do
-    let!(:owner) { create(:owner) }
-    let!(:existing_owners) { create_list(:owner, 10,) }
+    let!(:tenant) { create(:tenant) }
+    let!(:owner) { create_list(:owner, 10, tenant_id: tenant.id) }
     let!(:admin) { create(:admin) }
 
     context 'with correct authorization' do
@@ -49,8 +49,10 @@ RSpec.describe "Api::V1::Owners", type: :request do
   end
 
   describe "POST /create" do
+    let!(:tenant) { create(:tenant) }
+
     it 'with correct parameters returns 201 status' do
-      params = { owner: attributes_for(:owner) }
+      params = { owner: attributes_for(:owner, tenant_id: tenant.id) }
       post '/api/v1/owners', params: params
 
       expect(response).to have_http_status(:created)
@@ -65,7 +67,8 @@ RSpec.describe "Api::V1::Owners", type: :request do
   end
 
   describe "GET /show" do
-    let!(:owner) { create(:owner) }
+    let!(:tenant) { create(:tenant) }
+    let!(:owner) { create(:owner, tenant_id: tenant.id) }
     let!(:admin) { create(:admin) }
    
     context 'with correct authorization' do
@@ -115,7 +118,8 @@ RSpec.describe "Api::V1::Owners", type: :request do
   end
 
   describe "PATCH /update" do
-    let!(:owner) { create(:owner) }
+    let!(:tenant) { create(:tenant) }
+    let!(:owner) { create(:owner, tenant_id: tenant.id) }
     let!(:admin) { create(:admin) }
    
     context 'with correct authorization' do
@@ -170,8 +174,9 @@ RSpec.describe "Api::V1::Owners", type: :request do
   end
 
   describe "DELETE /destroy" do
+    let!(:tenant) { create(:tenant) }
+    let!(:owner) { create(:owner, tenant_id: tenant.id) }
     let!(:admin) { create(:admin) }
-    let!(:owner) { create(:owner) }
    
     context 'with correct authorization' do
       it 'returns 200 status for admin' do
@@ -195,7 +200,8 @@ RSpec.describe "Api::V1::Owners", type: :request do
   end
 
   describe 'load_owner' do
-    let!(:owner) { create(:owner) }
+    let!(:tenant) { create(:tenant) }
+    let!(:owner) { create(:owner, tenant_id: tenant.id) }
 
     it 'returns not found when resource does not exist' do
       get "/api/v1/owners/99999", headers: { 'Authorization' => access_token(owner)}

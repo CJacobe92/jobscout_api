@@ -17,6 +17,18 @@ admin = Admin.create!(
   otp_enabled: true
 )
 
+tenant = Tenant.create!(
+  company_name: 'Test Manpower Services Inc.',
+  firstname: 'test',
+  lastname: 'owner',
+  company_address: 'company address',
+  company_email: 'testmanpowerservices@agency.com',
+  license: '123456789',
+  contact_number: '987654321',
+  subdomain: "testmanpower",
+  subscription: 'enterprise',
+)
+
 owner = Owner.create!(
   firstname: 'test',
   lastname: 'owner',
@@ -27,17 +39,7 @@ owner = Owner.create!(
   enabled: true,
   otp_required: true,
   otp_enabled: true,
-)
-
-tenant = Tenant.create!(
-  company_name: 'Test Manpower Services Inc.',
-  company_owner: 'Test Owner',
-  company_address: 'company address',
-  company_email: 'testmanpowerservices@agency.com',
-  license: '123456789',
-  contact_number: '987654321',
-  subscription: 'enterprise',
-  owner_id: owner && owner.id
+  tenant_id: tenant && tenant.id
 )
 
 employee = Employee.create!(

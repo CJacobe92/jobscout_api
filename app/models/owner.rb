@@ -1,7 +1,7 @@
 class Owner < ApplicationRecord
   self.primary_key = 'id'
   has_secure_password
-  has_many :tenants
+  belongs_to :tenant
 
   validates :firstname, presence: true, on: :create
   validates :lastname, presence: true, on: :create

@@ -5,7 +5,6 @@ RSpec.describe "ApplicationController", type: :request do
   describe 'authenticate' do
     
     let!(:admin) { create(:admin) }
-    let!(:owner) { create(:owner) }
 
     context 'token_request' do
       it 'returns forbidden when header is blank' do
