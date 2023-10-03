@@ -3,9 +3,6 @@ require 'rails_helper'
 RSpec.describe Owner, type: :model do
   describe 'validations' do
     context 'initial validations' do
-      it { is_expected.to validate_presence_of(:firstname).on(:create) }
-      it { is_expected.to validate_presence_of(:lastname).on(:create) }
-      it { is_expected.to validate_presence_of(:username).on(:create) }
       it { is_expected.to validate_presence_of(:email).on(:create) }
       it { is_expected.to validate_presence_of(:password).on(:create) }
       it { is_expected.to validate_presence_of(:password_confirmation).on(:create) }

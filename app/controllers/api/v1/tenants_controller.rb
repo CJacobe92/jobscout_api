@@ -53,7 +53,7 @@ class Api::V1::TenantsController < ApplicationController
   private
 
   def tenant_params
-    params.require(:tenant).permit(:company_name, :firstname, :lastname, :company_address, :company_email, :license, :contact_number, :subscription, :subdomain, :activated)
+    params.require(:tenant).permit(:company_name, :principal, :company_address, :company_email, :license, :contact_number, :subscription, :subdomain, :activated)
   end
 
   def load_tenant
