@@ -11,6 +11,7 @@ class CreateAdmins < ActiveRecord::Migration[7.0]
       t.string :role, default: 'admin'
 
       # tokens and secrets
+      t.string :verification_token
       t.string :reset_token 
       t.string :activation_token
       t.string :refresh_token

@@ -7,27 +7,55 @@ class Api::V1::AuthController < ApplicationController
   include AccountFinder
   include HeadersHelper
   include TokenHelper
-  skip_before_action :authenticate, only: [:signin]
+  skip_before_action :authenticate, only: [:credentials, :password]
   
+  def credentials
+    credentials = params[:auth][:credentials]
+    
+    account = find_account(credentials)
 
-  def signin
-    credential  = params[:auth][:credential]
+    if account&.enabled
+      payload = { email: account.email }
+      token = encode_verification_token(payload)
+
+      account.update(verification_token: token)
+
+      cookies.signed[:verification] = {
+        expires: 10.minutes.from_now,
+        value: token,
+        httponly: true,
+        same_site: :none,
+        secure: true
+      }
+
+      head :ok
+
+    elsif account.nil?
+      render json: { error: 'Account does not exist' }, status: :not_found
+    else
+      render json: {error: 'Account deactivated'}, status: :unauthorized
+    end
+  end
+
+  def password
+    token = cookies.signed[:verification]
     password = params[:auth][:password]
+    result = decode_token(token)
+    credentials = result['email']
+    expiry = result['expiry']
 
-    find_and_authenticate_user(credential, password)
+    account = find_account(credentials)
+
+    if account&.verification_token != token || Time.now > expiry
+       render json: {error: 'Please sign in in again to continue'}, status: :unauthorized
+    elsif account&.authenticate(password)
+      handle_successful_signin(account)
+    else
+      render json: {error: 'Incorrect password'}, status: :unauthorized
+    end
   end
 
   private
-
-  def find_and_authenticate_user(credential, password)
-    account = find_account(credential)
-
-    if account&.enabled && account&.authenticate(password)
-      handle_successful_signin(account)
-    else
-      handle_failed_signin(account)
-    end
-  end
 
   def handle_successful_signin(account)
     payload = {email: account&.email, role: account.role}
@@ -49,17 +77,7 @@ class Api::V1::AuthController < ApplicationController
     render json: { message: 'Login success', access_token: access_token }, status: :ok
   end
 
-  def handle_failed_signin(account)
-    if account.nil?
-      render json: { error: 'Account does not exist' }, status: :unauthorized
-    elsif !account.enabled
-      render json: { error: 'Account disabled' }, status: :unauthorized
-    else
-      render json: { error: 'Incorrect password' }, status: :unauthorized
-    end
-  end
-
   def auth_params
-    params.require(:auth).permit(:credential, :password)
+    params.require(:auth).permit(:credentials, :password)
   end
 end

@@ -12,7 +12,8 @@ Rails.application.routes.draw do
 
       resources :auth, only: [] do
         collection do
-          post :signin
+          post :credentials
+          post :password
         end
       end
     end
