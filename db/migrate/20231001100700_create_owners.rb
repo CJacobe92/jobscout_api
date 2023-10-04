@@ -11,6 +11,7 @@ class CreateOwners < ActiveRecord::Migration[7.0]
       t.string :role, default: 'owner'
 
       # tokens and secrets
+      t.string :verification_token
       t.string :reset_token 
       t.string :activation_token
       t.string :refresh_token
