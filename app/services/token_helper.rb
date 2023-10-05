@@ -5,7 +5,7 @@ module TokenHelper
   end
 
   def encode_verification_token(payload)
-    payload[:expiry] = (Time.now + 10.minutes).iso8601
+    payload[:expiry] = (Time.now + 30.minutes).iso8601
     return verification_token = JWT.encode(payload, secret_key)
   end
 

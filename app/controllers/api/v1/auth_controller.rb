@@ -28,7 +28,7 @@ class Api::V1::AuthController < ApplicationController
         secure: true
       }
 
-      head :ok
+      render json: { account: account.email}, status: :ok
 
     elsif account.nil?
       render json: { error: 'Account does not exist' }, status: :not_found
@@ -47,6 +47,13 @@ class Api::V1::AuthController < ApplicationController
     account = find_account(credentials)
 
     if account&.verification_token != token || Time.now > expiry
+
+      cookies.delete(:verification, {
+        httponly: true,
+        same_site: :none,
+        secure: true
+      })
+  
        render json: {error: 'Please sign in in again to continue'}, status: :unauthorized
     elsif account&.authenticate(password)
       handle_successful_signin(account)
