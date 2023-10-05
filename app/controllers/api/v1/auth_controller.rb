@@ -7,7 +7,7 @@ class Api::V1::AuthController < ApplicationController
   include AccountFinder
   include HeadersHelper
   include TokenHelper
-  skip_before_action :authenticate, only: [:credentials, :password]
+  skip_before_action :authenticate, only: [:credentials, :password, :refresh]
   
   def credentials
     credentials = params[:auth][:credentials]
@@ -21,7 +21,7 @@ class Api::V1::AuthController < ApplicationController
       account.update(verification_token: token)
 
       cookies.signed[:verification] = {
-        expires: 10.minutes.from_now,
+        expires: 8.hours.from_now,
         value: token,
         httponly: true,
         same_site: :none,
@@ -62,6 +62,18 @@ class Api::V1::AuthController < ApplicationController
     end
   end
 
+  def refresh
+    result = token_from_cookies
+    account = validate_refresh_token(result)
+    
+    payload = {email: account.email, role: account.role}
+    access_token = encode_access_token(payload)
+    account&.update(access_token: access_token)
+    response_headers(account, access_token)
+
+    head :ok 
+  end
+
   private
 
   def handle_successful_signin(account)
@@ -82,6 +94,39 @@ class Api::V1::AuthController < ApplicationController
     response_headers(account, access_token)
 
     render json: { message: 'Login success', access_token: access_token }, status: :ok
+  end
+
+  def token_from_cookies
+    token = cookies.signed[:refresh_token]
+    
+    if token.blank?
+      render json: MISSING_COOKIE_VALUE, status: :unauthorized
+    elsif token&.split('.')&.length != 3
+      render json: MALFORMED_COOKIE_VALUE, status: :unauthorized
+    end
+
+    token
+  end
+  
+  def validate_refresh_token(token)
+    result = decode_token(token)
+    expiry = result['expiry']
+    email = result['email']
+    account = find_account(email)
+
+    if account.nil?
+      render json: BAD_CREDENTIALS, status: :unauthorized
+    elsif account.refresh_token != token
+      render json: MISMATCHED_REFRESH_TOKEN, status: :unauthorized
+    elsif expiry < Time.now
+      render json: EXPIRED_REFRESH_TOKEN, status: :unauthorized
+    end
+
+    account
+  end
+
+  def expire_refresh_token_cookie
+    cookies.delete(:refresh_token)
   end
 
   def auth_params

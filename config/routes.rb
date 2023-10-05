@@ -14,6 +14,7 @@ Rails.application.routes.draw do
         collection do
           post :credentials
           post :password
+          get :refresh
         end
       end
     end
