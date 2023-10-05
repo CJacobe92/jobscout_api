@@ -1,11 +1,11 @@
 module TokenHelper
   def encode_access_token(payload)
-    payload[:expiry] = (Time.now + 30.minutes).iso8601
+    payload[:expiry] = (Time.now + 1.hour).iso8601
     return access_token = JWT.encode(payload, secret_key)
   end
 
   def encode_verification_token(payload)
-    payload[:expiry] = (Time.now + 30.minutes).iso8601
+    payload[:expiry] = (Time.now + 8.hours).iso8601
     return verification_token = JWT.encode(payload, secret_key)
   end
 

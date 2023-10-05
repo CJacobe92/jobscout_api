@@ -35,8 +35,25 @@ module MessageHelper
     error_description: 'Record creation or update failed due to invalid parameters.'
   }.freeze
   
-  DELETION_FAILED = {
-    error: 'Resource deletion failed',
-    error_description: 'Record deletion failed due to invalid parameters.'
+  EXPIRED_REFRESH_TOKEN = {
+    error: 'Invalid refresh Token',
+    error_description: 'Authenticating using an expired token',
+    message: 'Bad credentials'
   }.freeze
+
+  MISMATCHED_REFRESH_TOKEN = {
+    error: 'Refresh token mismatched',
+    message: 'Bad credentials'
+  }.freeze
+
+  MISSING_COOKIE_VALUE = {
+    error: 'Empty cookie',
+    error_description: 'Blank cookie value',
+  }
+
+  MALFORMED_COOKIE_VALUE = {
+    error: 'Malformed cookie',
+    error_description: 'Cookie value length did not match the requirements',
+  }
+  
 end
