@@ -1,10 +1,4 @@
-# This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Examples:
-#
-#   movies = Movie.create([{ name: "Star Wars" }, { name: "Lord of the Rings" }])
-#   Character.create(name: "Luke", movie: movies.first)
+
 admin = Admin.create!(
   firstname: 'global',
   lastname: 'admin',
@@ -17,11 +11,12 @@ admin = Admin.create!(
   otp_enabled: true
 )
 
+
 tenant = Tenant.create!(
-  company_name: 'Test Manpower Services Inc.',
-  principal: 'test owner',
+  company_name: 'First Test Manpower Services Inc.',
+  principal: 'first test owner',
   company_address: 'company address',
-  company_email: 'testmanpowerservices@agency.com',
+  company_email: 'firsttestmanpowerservices@agency.com',
   license: '123456789',
   contact_number: '987654321',
   subdomain: "testmanpower",
@@ -41,28 +36,20 @@ owner = Owner.create!(
   tenant_id: tenant && tenant.id
 )
 
-employee = Employee.create!(
-  firstname: 'test',
-  lastname: 'employee',
-  username: 'test.employee',
-  email: 'test.employee@email.com',
-  password: 'password',
-  password_confirmation: 'password',
-  enabled: true,
-  otp_required: true,
-  otp_enabled: true,
-  tenant_id: tenant && tenant.id
-)
-
-employer = Employer.create!(
-  company_name:  'test company inc.',
-  company_hq: 'California, USA',
-  company_email: 'test.company@email.com',
-  company_phone: '12345678',
-  company_poc: 'John Doe',
-  tenant_id: tenant.id
-)
-
+100.times do |n| 
+    Employee.create!(
+    firstname: 'test',
+    lastname: "employee#{n}",
+    username: "test.employee#{n}",
+    email: "test.employee#{n}@email.com",
+    password: 'password',
+    password_confirmation: 'password',
+    enabled: true,
+    otp_required: true,
+    otp_enabled: true,
+    tenant_id: tenant && tenant.id
+  )
+end
 
 applicant = Applicant.create!(
   firstname: 'test1',
@@ -478,25 +465,45 @@ location = [
 'Auckland, New Zealand'
 ]
 
-description = ["Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur elementum tellus ut porttitor hendrerit. Ut gravida, felis quis cursus varius, ante lacus semper orci, non aliquet dolor lorem ultrices erat. In commodo rutrum sodales. Nunc at libero pharetra, varius mi sed, rhoncus felis. Nullam viverra arcu quis ipsum finibus facilisis. Sed iaculis consequat diam vitae maximus. Suspendisse id nisi massa. Vestibulum nec cursus purus. Integer suscipit lobortis eros, efficitur condimentum ipsum laoreet aliquet. Proin malesuada tellus at sapien consectetur, nec tempor turpis tempus. Morbi convallis efficitur orci, id pharetra leo bibendum ac."]
+description = ["Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc aliquam nisi sit amet sagittis pretium. Sed molestie erat vitae dolor pharetra lobortis. Nunc scelerisque eget odio vel laoreet. Quisque ac congue arcu. Morbi faucibus pellentesque vehicula. Donec hendrerit ullamcorper eros at commodo. Nam non tincidunt nisi, et laoreet urna. Phasellus nec ligula dolor. Praesent convallis ornare neque, in facilisis ex dignissim id. Quisque blandit venenatis mollis. Donec eget tortor bibendum purus aliquet sodales scelerisque ut nulla. Fusce vulputate tincidunt molestie.
+
+Integer sollicitudin congue dolor, eu porttitor mauris aliquet ut. Maecenas sodales aliquam molestie. Etiam in lorem quam. Duis pretium id ante quis euismod. Phasellus et odio vel urna venenatis mattis. Morbi posuere bibendum nisi, sit amet eleifend orci aliquet nec. Morbi fermentum elit id consequat mollis. Ut vel condimentum nibh. Quisque ut elit tortor. Sed ac urna at augue elementum ornare. Praesent sodales est non hendrerit viverra.
+
+Vestibulum dignissim lectus sed luctus volutpat. Proin non mollis quam. Ut pulvinar risus odio, ac fringilla libero egestas eget. Phasellus sodales sollicitudin arcu, vel semper justo convallis a. Suspendisse potenti. In at condimentum erat. Duis pellentesque convallis nibh, at maximus tellus consequat vitae. Donec in mollis magna, vel mollis enim. Nunc mollis nisl varius, blandit est nec, convallis nisi. Phasellus sed varius tellus. Suspendisse potenti. Pellentesque vel aliquet ex. Aliquam tristique lacinia nibh, non placerat diam sollicitudin tincidunt. Praesent fringilla condimentum nunc, vitae auctor velit rutrum a. In malesuada scelerisque massa, vel euismod arcu luctus at. Nulla commodo vestibulum gravida.
+
+Praesent ullamcorper sodales malesuada. Cras eu consequat felis. Quisque luctus porta purus sit amet hendrerit. Nulla a metus malesuada, lacinia ipsum sed, tincidunt turpis. Ut metus nisi, sollicitudin id egestas non, interdum et dui. Morbi in elit turpis. Vivamus sed aliquet justo. Donec volutpat lorem a ligula lacinia, sit amet pellentesque lorem lobortis. Cras erat dolor, malesuada lobortis cursus ut, interdum non enim. Donec mollis, purus in semper accumsan, ligula ipsum ullamcorper ligula, eget consectetur quam augue id quam. Cras id nisi rhoncus lacus porta pellentesque at vitae urna. Suspendisse ullamcorper vestibulum sapien, venenatis egestas purus ornare id. Donec congue, nisl ac efficitur posuere, lectus dolor consequat enim, nec rutrum tortor diam rutrum est. Cras posuere posuere laoreet.
+
+Donec vel justo erat. Phasellus in odio nec lacus varius sollicitudin sit amet id mi. Nulla nec aliquet eros. Vestibulum eu pellentesque augue, at euismod turpis. Cras condimentum malesuada diam vitae bibendum. Duis sodales imperdiet sem, in bibendum magna. In eu ornare nulla, ac ornare massa. Nullam tempor faucibus interdum. Aliquam erat volutpat. Suspendisse sed auctor augue. Cras blandit augue ut ipsum auctor porttitor. Aenean pulvinar eu quam vitae consequat. Nam blandit nulla vitae purus imperdiet, in euismod nibh ornare. Aenean hendrerit quis nibh vel posuere. Phasellus et ipsum luctus, placerat ex quis, hendrerit lacus. Curabitur magna justo, maximus ac dapibus sit amet, pharetra sit amet orci."]
 requirement = ["Bachelor's degree, excellent communication skills, problem-solving abilities, team player, attention to detail, time management skills, basic computer skills and valid driver's license"]
-
+title = ['HR Manager', 'Chief Executive Officer', 'Talent Acquisition']
 job_type = ['Full-Time', 'Temporary', 'Part-Time']
-status = ['New', 'Open', 'Closed']
 
-1000.times do |n|
-  job = Job.create!(
-    job_name: profession.sample,
-    job_description: description.sample,
-    job_requirement: requirement.sample,
-    job_headcount: rand(5..20),
-    job_salary: rand(3000..8000),
-    job_currency: 'USD',
-    job_status: status.sample,
-    job_location: location.sample,
-    job_type: job_type.sample,
-    tags: "Tag #{n + 1}",
-    deadline: (Date.today + rand(1..90).days),
-    employer_id: employer.id
+# Create 50 employers (50x20 = 1000 total jobs)
+50.times do |employer_index|
+  employer = Employer.create!(
+    company_name: "Test Company #{employer_index + 1}",
+    company_address: "Company Address #{employer_index + 1}",
+    company_email: "company#{employer_index + 1}@example.com",
+    company_phone: "12345678#{employer_index + 1}",
+    company_poc_name: "John Doe#{employer_index + 1}",
+    company_poc_title: title.sample,
+    tenant_id: tenant.id
   )
+
+  # Create 20 jobs for each employer
+  20.times do |job_index|
+    job = Job.create!(
+      job_name: profession.sample,
+      job_description: description.sample,
+      job_requirement: requirement.sample,
+      job_headcount: rand(5..20),
+      job_salary: rand(3000..8000),
+      job_currency: 'USD',
+      job_location: location.sample,
+      job_type: job_type.sample,
+      tags: "Tag #{job_index + 1}",
+      deadline: (Date.today + rand(1..90).days),
+      employer_id: employer.id
+    )
+  end
 end

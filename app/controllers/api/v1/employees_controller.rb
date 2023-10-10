@@ -5,7 +5,25 @@ class Api::V1::EmployeesController < ApplicationController
 
   def index
     if administration_scope
-      @employees = Employee.all
+        query = params[:query]
+        page = params[:page] || 1
+        tenant_id = params[:tenant_id]
+      
+        if query.present?
+          search_conditions = [
+            'LOWER(firstname) LIKE :query OR
+             LOWER(lastname) LIKE :query OR
+             LOWER(email) LIKE :query OR
+             LOWER(username) LIKE :query'
+          ]
+
+          where_conditions = search_conditions.join(' OR ')
+
+          @employees = Employee.where(tenant_id: tenant_id).where(where_conditions, query: "%#{query}%").page(page)
+        else
+          @employees = Employee.where(tenant_id: tenant_id).page(page)
+        end
+      # mekus mekus mo na yan insan!
       render 'index', status: :ok
     else
       render json: UNAUTHORIZED, status: :unauthorized

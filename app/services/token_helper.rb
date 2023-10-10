@@ -15,7 +15,7 @@ module TokenHelper
   end
 
   def encode_refresh_token(payload)
-    payload[:expiry] = (Time.now + 7.days).iso8601
+    payload[:expiry] = (Time.now + 24.hours).iso8601
     return refresh_token = JWT.encode(payload, secret_key)
   end
 

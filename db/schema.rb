@@ -82,11 +82,11 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_02_101180) do
 
   create_table "employers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "company_name"
-    t.string "company_hq"
     t.string "company_address"
     t.string "company_email"
     t.string "company_phone"
-    t.string "company_poc"
+    t.string "company_poc_name"
+    t.string "company_poc_title"
     t.uuid "tenant_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -115,18 +115,18 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_02_101180) do
     t.text "job_description"
     t.text "job_requirement"
     t.integer "job_headcount"
+    t.integer "hired", default: 0
     t.string "job_salary"
     t.string "job_currency"
-    t.string "job_status"
+    t.string "job_status", default: "new"
     t.string "job_location"
     t.string "tags"
     t.string "job_type"
+    t.string "assignment", default: "unassigned"
     t.date "deadline"
     t.uuid "employer_id", null: false
-    t.uuid "employee_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["employee_id"], name: "index_jobs_on_employee_id"
     t.index ["employer_id"], name: "index_jobs_on_employer_id"
   end
 
@@ -172,7 +172,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_02_101180) do
   add_foreign_key "employers", "tenants"
   add_foreign_key "job_histories", "employers"
   add_foreign_key "job_histories", "jobs"
-  add_foreign_key "jobs", "employees"
   add_foreign_key "jobs", "employers"
   add_foreign_key "owners", "tenants"
 end

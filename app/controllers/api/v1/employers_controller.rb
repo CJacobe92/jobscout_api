@@ -5,8 +5,25 @@ class Api::V1::EmployersController < ApplicationController
 
   def index
     if administration_scope
-      @employers = Employer.all
-      render 'index', status: :ok
+      query = params[:query]
+      page = params[:page] || 1
+
+      if query.present?
+        search_conditions = [
+          'LOWER(company_name) LIKE :query OR
+           LOWER(company_address) LIKE :query OR 
+           LOWER(company_email) LIKE :query OR
+           LOWER(company_phone) LIKE :query OR
+           LOWER(company_poc_name) LIKE :query OR
+           LOWER(company_poc_title) LIKE :query'
+        ]
+
+        where_conditions = search_conditions.join(' OR ')
+
+        @employers = Employer.where(where_conditions, query: "%#{query}%").page(page).per(10)
+      else
+        @employers = Employer.where(tenant: params[:tenant_id]).page(page).per(10)
+      end
     else
       render json: UNAUTHORIZED, status: :unauthorized
     end
@@ -55,12 +72,12 @@ class Api::V1::EmployersController < ApplicationController
   private
 
   def employer_params
-    params.require(:employer).permit(:company_name, :company_hq, :company_email, :company_phone, :company_poc, :tenant_id)
+    params.require(:employer).permit(:company_name, :company_address, :company_email, :company_phone, :company_poc_name, :company_poc_title, :tenant_id)
   end
   
   def load_employer
     begin
-      @current_employer = Employer.find(params[:id])
+      @current_employer = Employer.includes(:jobs).find(params[:id])
     rescue ActiveRecord::RecordNotFound
       render json: { error: 'Resource not found' }, status: :not_found
     end
