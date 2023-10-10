@@ -19,14 +19,7 @@ class Api::V1::AuthController < ApplicationController
       token = encode_verification_token(payload)
 
       account.update(verification_token: token)
-
-      cookies.signed[:verification] = {
-        expires: 8.hours.from_now,
-        value: token,
-        httponly: true,
-        same_site: :none,
-        secure: true
-      }
+      response_headers(account, token)
 
       render json: { account: account.email}, status: :ok
 
@@ -38,7 +31,7 @@ class Api::V1::AuthController < ApplicationController
   end
 
   def password
-    token = cookies.signed[:verification]
+    token = params[:token]
     password = params[:auth][:password]
     result = decode_token(token)
     credentials = result['email']
@@ -46,7 +39,7 @@ class Api::V1::AuthController < ApplicationController
 
     account = find_account(credentials)
 
-    if account&.verification_token != token || Time.now > expiry
+    if account&.email != credentials || Time.now > expiry
 
       cookies.delete(:verification, {
         httponly: true,
@@ -54,9 +47,10 @@ class Api::V1::AuthController < ApplicationController
         secure: true
       })
   
-       render json: {error: 'Please sign in in again to continue'}, status: :unauthorized
+       render json: {error: 'Invalid access'}, status: :unauthorized
     elsif account&.authenticate(password)
       handle_successful_signin(account)
+
     else
       render json: {error: 'Incorrect password'}, status: :unauthorized
     end

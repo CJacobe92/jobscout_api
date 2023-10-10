@@ -7,5 +7,6 @@ json.merge! @current_admin.attributes.except(
   'enabled',
   'otp_enabled',
   'otp_required',
-  'activation_token'
+  'activation_token',
+  'verification_token'
 )

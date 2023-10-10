@@ -2,7 +2,7 @@ class Api::V1::TenantsController < ApplicationController
   include TenantPermissions
   include GlobalPermissions
   include MessageHelper
-  before_action :load_tenant, except: [ :index, :create ]
+  before_action :load_tenant, except: [ :index, :create]
   before_action :authenticate, except: [:create]
 
   def index

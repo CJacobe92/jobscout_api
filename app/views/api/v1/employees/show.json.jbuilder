@@ -1,4 +1,6 @@
 json.merge! @current_employee.attributes.except(
+  'username',
+  'role',
   'password_digest', 
   'access_token',
   'refresh_token',
@@ -7,6 +9,9 @@ json.merge! @current_employee.attributes.except(
   'enabled',
   'otp_enabled',
   'otp_required',
-  'activation_token'
+  'activation_token',
+  'verification_token',
+  'created_at',
+  'updated_at'
 )
   
