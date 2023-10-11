@@ -10,12 +10,13 @@ Rails.application.routes.draw do
       resources :employees
       resources :employers
 
-
       resources :jobs, only: [:index, :create, :update, :show, :destroy] do
         collection do
           get :tenant_index
         end
       end
+
+      resources :job_applications
 
       resources :auth, only: [] do
         collection do
