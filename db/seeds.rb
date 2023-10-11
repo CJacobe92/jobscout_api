@@ -36,7 +36,7 @@ owner = Owner.create!(
   tenant_id: tenant && tenant.id
 )
 
-100.times do |n| 
+50.times do |n| 
     Employee.create!(
     firstname: 'test',
     lastname: "employee#{n}",
@@ -51,7 +51,8 @@ owner = Owner.create!(
   )
 end
 
-applicant = Applicant.create!(
+# Create applicants
+applicant1 = Applicant.create!(
   firstname: 'test1',
   lastname: 'applicant',
   username: 'test1.applicant',
@@ -63,7 +64,7 @@ applicant = Applicant.create!(
   otp_enabled: true,
 )
 
-applicant = Applicant.create!(
+applicant2 = Applicant.create!(
   firstname: 'test2',
   lastname: 'applicant',
   username: 'test2.applicant',
@@ -74,6 +75,64 @@ applicant = Applicant.create!(
   otp_required: true,
   otp_enabled: true,
 )
+
+five_profession = [
+  "Web Developer",
+  "Computer Programmer",
+  "IT Manager",
+  "Full-Stack Developer",
+  "DevOps Engineer",
+  "Cloud Solutions Architect",
+]
+
+employer = Employer.create!(
+  company_name: "Another Company",
+  company_address: "Another Company Address",
+  company_email: "anothercompany@example.com",
+  company_phone: "1234567890",
+  company_poc_name: "Jane Doe",
+  company_poc_title: 'HR Generalist',
+  tenant_id: tenant.id
+)
+
+# Create jobs
+jobs = []
+5.times do |job_index|
+  job = Job.create!(
+    job_name: five_profession[job_index],
+    job_description: 'Description',
+    job_requirement: 'Requirement',
+    job_headcount: rand(5..20),
+    job_salary: rand(3000..8000),
+    job_currency: 'USD',
+    job_location: 'Sydney, Australia',
+    job_type: ['full-time', 'part-time', 'temporary'].sample,
+    tags: "Tag #{job_index + 1}",
+    deadline: (Date.today + rand(1..90).days),
+    employer_id: employer.id
+  )
+  jobs << job
+end
+
+# Create job applications for each applicant
+applicants = [applicant1, applicant2]
+applicants.each do |applicant|
+  jobs.each do |job|
+    JobApplication.create!(
+      firstname: applicant.firstname,
+      lastname: applicant.lastname,
+      email: applicant.email,
+      company_name: employer.company_name,
+      job_name: job.job_name,
+      job_location: job.job_location,
+      job_type: job.job_type,
+      status: 'applied',
+      applicant_id: applicant.id,
+      job_id: job.id,
+    )
+  end
+end
+
 
 profession = [
   "Dentist",
@@ -507,3 +566,4 @@ job_type = ['Full-Time', 'Temporary', 'Part-Time']
     )
   end
 end
+
